@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-11 14:28:07
+ * @LastEditTime: 2021-10-12 15:41:41
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -62,6 +62,10 @@ export default {
       setTimeout(() => {
         this.mjs3d.setPipeLine()
       }, 1000)
+
+      this.mjs3d.setMonitor()
+
+      this.mjs3d.addShapeDRN()
     },
     joinImg(item) {
       const arr = ['skinUp', 'skinBottom', 'skinRight', 'skinLeft', 'skinFront', 'skinBack']

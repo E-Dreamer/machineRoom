@@ -13,6 +13,7 @@ import Stats from 'stats-js'
 import store from '@/store'
 
 import mouseEvent from './btn'
+
 // 节流
 function throttle(event, time) {
   let pre = 0
@@ -83,17 +84,19 @@ export default class Mjs3d {
       rotate.z && mesh.rotateZ(rotate.z)
     },
     // 查找对象
-    findObject: (_objname) => {
-      let findedobj = null
-      this.sceneObject.map((_obj) => {
+    findObject: (_objname, source = this.sceneObject, result = []) => {
+      source.map((_obj) => {
         if (_obj.name !== null && _obj.name !== '') {
           if (_obj.name === _objname) {
-            findedobj = _obj
+            result.push(_obj)
+            return true
+          } else if (_obj.type === 'Group') {
+            this.commonFunc.findObject(_objname, _obj.children, result)
             return true
           }
         }
       })
-      return findedobj
+      return result[0]
     },
     // 判断对象
     hasObj(_obj) {
@@ -1504,13 +1507,19 @@ export default class Mjs3d {
   }
   // 生成Tube 管道缓冲几何体
   initTube(obj) {
-    const { pathArr, radius, skin, name } = obj
+    const {
+      pathArr,
+      radius,
+      skin,
+      name
+    } = obj
     const path = this.createPath(pathArr)
     const geometry = new THREE.TubeGeometry(path, 3000, radius, 8, false)
     const material = new THREE.MeshBasicMaterial({
       color: (skin && skin.color) || '#fff',
       transparent: (skin && skin.transparent) || null,
-      opacity: (skin && skin.opacity) || 1
+      opacity: (skin && skin.opacity) || 1,
+      side: THREE.DoubleSide
     })
     const mesh = new THREE.Mesh(geometry, material)
     mesh.name = name
@@ -1647,5 +1656,288 @@ export default class Mjs3d {
       allGroup.add(group)
       this.addObject(allGroup)
     })
+  }
+  //* 生成 监视器
+  setMonitor() {
+    const group = new THREE.Group()
+    group.position.set(100, 30, 0)
+    group.name = 'monitorSpin'
+
+    const geometry = new THREE.BufferGeometry()
+    // 底座
+    const trape = [
+      // 梯形
+      0, 0, 15,
+      -15, 5, 15,
+      -15, 10, 15,
+
+      0, 0, 15,
+      -15, 10, 15,
+      15, 10, 15,
+
+      0, 0, 15,
+      15, 10, 15,
+      15, 5, 15,
+
+      // 梯形
+      0, 0, -15,
+      -15, 5, -15,
+      -15, 10, -15,
+
+      0, 0, -15,
+      -15, 10, -15,
+      15, 10, -15,
+
+      0, 0, -15,
+      15, 10, -15,
+      15, 5, -15,
+
+      // 梯形前面两个正方形
+      15, 5, 15,
+      0, 0, 15,
+      0, 0, -15,
+
+      15, 5, 15,
+      0, 0, -15,
+      15, 5, -15,
+
+      15, 5, 15,
+      15, 10, 15,
+      15, 10, -15,
+
+      15, 5, 15,
+      15, 10, -15,
+      15, 5, -15,
+
+      -15, 5, 15,
+      0, 0, 15,
+      0, 0, -15,
+
+      -15, 5, 15,
+      0, 0, -15,
+      -15, 5, -15,
+
+      -15, 5, 15,
+      -15, 10, 15,
+      -15, 10, -15,
+
+      -15, 5, 15,
+      -15, 10, -15,
+      -15, 5, -15,
+
+      15, 10, 15,
+      15, 10, -15,
+      -15, 10, -15,
+
+      15, 10, 15,
+      -15, 10, -15,
+      -15, 10, 15
+    ]
+    // 监视器内部
+    const monitorArr = [
+      50, 10, 20,
+      -50, 10, 20,
+      -50, 50, 20,
+
+      50, 10, 20,
+      -50, 50, 20,
+      70, 50, 20,
+
+      50, 10, -20,
+      -50, 10, -20,
+      -50, 50, -20,
+
+      50, 10, -20,
+      -50, 50, -20,
+      70, 50, -20,
+
+      // 顶面
+      -50, 50, 20,
+      -50, 50, -20,
+      70, 50, -20,
+
+      -50, 50, 20,
+      70, 50, 20,
+      70, 50, -20,
+
+      // 背面
+      -50, 10, 20,
+      -50, 50, 20,
+      -50, 50, -20,
+
+      -50, 10, 20,
+      -50, 10, -20,
+      -50, 50, -20,
+      // 底部
+      -50, 10, 20,
+      -50, 10, -20,
+      50, 10, -20,
+
+      -50, 10, 20,
+      50, 10, 20,
+      50, 10, -20,
+
+      // 需要贴图的面
+      50, 10, 20,
+      70, 50, 20,
+      70, 50, -20,
+
+      50, 10, 20,
+      50, 10, -20,
+      70, 50, -20
+    ]
+
+    // 外壳
+    const shell = [
+      75, 25, 22,
+      -62, 25, 22,
+      -62, 55, 22,
+
+      75, 25, 22,
+      90, 55, 22,
+      -62, 55, 22,
+
+      75, 25, -22,
+      -62, 25, -22,
+      -62, 55, -22,
+
+      75, 25, -22,
+      90, 55, -22,
+      -62, 55, -22,
+
+      // 顶部
+      90, 55, 22,
+      -62, 55, 22,
+      -62, 55, -22,
+
+      90, 55, 22,
+      -62, 55, -22,
+      90, 55, -22
+    ]
+    const points = new Float32Array([...trape, ...monitorArr, ...shell])
+    geometry.setAttribute('position', new THREE.BufferAttribute(points, 3))
+
+    const uvs = new Float32Array([
+      50, 10, 20,
+      70, 50, 20,
+      70, 50, -20,
+
+      50, 10, 20,
+      50, 10, -20,
+      70, 50, -20
+    ])
+    const material = this.commonFunc.setMaterials({
+      color: '#eae9ee',
+      side: THREE.DoubleSide
+    })
+    const mesh = new THREE.Mesh(geometry, material)
+    group.add(mesh)
+    // this.addObject(group)
+    const monitor = this.commonFunc.findObject('monitor')
+    monitor.add(group)
+    console.log(monitor)
+  }
+
+  addShapeDRN(obj) {
+    // Arc circle圆弧drn
+    /**
+     * absarc ( x : Float, y : Float, radius : Float, startAngle : Float, endAngle : Float, clockwise : Float ) : null
+     * x, y -- 弧线的绝对中心。
+     * radius -- 弧线的半径。
+     * startAngle -- 起始角,以弧度来表示。
+     *endAngle -- 终止角,以弧度来表示。
+     *clockwise -- 以顺时针方向创建(扫过)弧线。默认值为false。
+     * ;type {Shape}
+     */
+    /**
+     *.arc ( x : Float, y : Float, radius : Float, startAngle : Float, endAngle : Float, clockwise : Float ) : null
+     x, y -- 弧线的中心来自上次调用后的偏移量。
+     radius -- 弧线的半径。
+     startAngle -- 起始角,以弧度来表示。
+     endAngle -- 终止角,以弧度来表示。
+     clockwise -- 以顺时针方向创建(扫过)弧线。默认值为false。
+     */
+    var arcShapeDrn01 = new THREE.Shape()
+    //  需要长:280,高300 平分6分,60度,中间有间隙取50度, 通过公式,为L=n× π× r/180,L=α× r。其中n是圆心角度数,r是半径,L是圆心角弧长得 r=320,n=50,弧度=280,
+    arcShapeDrn01.moveTo(260, 0)
+    arcShapeDrn01.lineTo(270, 0)
+    arcShapeDrn01.absarc(0, 0, 270, 0, Math.PI * 2 / 6 / 6 * 5, false)
+    arcShapeDrn01.absarc(0, 0, 260, Math.PI * 2 / 6 / 6 * 5, 0, true)
+    var shape = arcShapeDrn01
+
+    /**
+      *curveSegments — int,曲线上点的数量,默认值是12。
+      steps — int,用于沿着挤出样条的深度细分的点的数量,默认值为1。
+      depth — float,挤出的形状的深度,默认值为100。
+      bevelEnabled — bool,对挤出的形状应用是否斜角,默认值为true。
+      bevelThickness — float,设置原始形状上斜角的厚度。默认值为6。
+      bevelSize — float。斜角与原始形状轮廓之间的延伸距离,默认值为bevelThickness-2。
+      bevelSegments — int。斜角的分段层数,默认值为3。
+      extrudePath — THREE.CurvePath对象。一条沿着被挤出形状的三维样条线。
+      UVGenerator — Object。提供了UV生成器函数的对象。
+      */
+    var extrudeSettings = {
+      depth: 350,
+      bevelEnabled: false,
+      bevelSegments: 9,
+      steps: 2,
+      bevelSize: 0,
+      bevelThickness: 0
+    }
+    const x = -500
+    const y = 450
+    const z = 0
+
+    const rx = Math.PI / 2
+    const ry = 0
+    const rz = 0
+    const s = 1
+    const group = new THREE.Group()
+    group.name = '3d'
+    group.position.set(0, 0, 0)
+
+    const texture = new THREE.TextureLoader().load(require('../assets/images/scene.png'))
+    console.log(texture)
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+    // texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
+    texture.repeat.set(0.004, 0.001)
+    // 弧线
+    // const geometry = new THREE.ShapeBufferGeometry(shape)
+    // const mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+    //   side: THREE.DoubleSide,
+    //   map: texture
+    // }))
+    // mesh.position.set(x, y, z, -175)
+    // mesh.rotation.set(rx, ry, rz)
+    // mesh.scale.set(s, s, s)
+    // group.add(mesh)
+
+    const geometry1 = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings)
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x6188d2,
+      // opacity: 0.8,
+      // transparent: true,
+      map: texture
+    })
+    var mesh1 = new THREE.Mesh(geometry1, material)
+    mesh1.position.set(x, y, z)
+    mesh1.rotation.set(rx, ry, rz)
+    mesh1.scale.set(s, s, s)
+    group.add(mesh1)
+
+    var mesh2 = mesh1.clone()
+    mesh2.rotateZ(Math.PI * 2 / 5)
+    group.add(mesh2)
+    var mesh3 = mesh2.clone()
+    mesh3.rotateZ(Math.PI * 2 / 5)
+    group.add(mesh3)
+    var mesh4 = mesh3.clone()
+    mesh4.rotateZ(Math.PI * 2 / 5)
+    group.add(mesh4)
+    var mesh5 = mesh4.clone()
+    mesh5.rotateZ(Math.PI * 2 / 5)
+    group.add(mesh5)
+
+    this.addObject(group)
   }
 }

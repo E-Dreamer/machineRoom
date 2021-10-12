@@ -88,4 +88,30 @@
      opacity: 0.6
   }
 }
+
+btn 物体点击事件配置
+const mouseEvent = {
+  <!-- 单击 -->
+  click: [
+    {
+     obj_name:"cabinet",//设置的物体的名称
+     obj_event(obj){
+   
+     }
+    } 
+   或者
+    {
+      findObject(_objname) {
+                // 判断
+                if (_objname.indexOf('cabinet') >= 0 && _objname.indexOf('door') >= 0) {
+                  return true;
+                }
+                return false;
+      },
+    }
+  ],
+  <!-- 鼠标经过 -->
+  hover: []
+}
+
 ```
