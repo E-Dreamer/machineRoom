@@ -323,11 +323,11 @@ export default class Mjs3d {
     const openEnded = obj.openEnded || false
     const geometry = new THREE.CylinderGeometry(width, height, depth, radial, heightSegments, openEnded)
     let texture = null
-    if (skin.img) {
+    if (skin && skin.img) {
       texture = new THREE.TextureLoader().load(skin.img)
     }
     const material = this.commonFunc.setMaterials({
-      color: skin.color || '#fff',
+      color: (skin && skin.color) || '#fff',
       map: texture || null
     })
     const cylinder = new THREE.Mesh(geometry, material)
@@ -1467,6 +1467,26 @@ export default class Mjs3d {
       this.restore('usage')
     }
   }
+  addUsage2(name) {
+    if (!this.createBtn.usage) {
+      this.createBtn.usage = true
+      const findNameObj = (name, arr = this.sceneObject, result = []) => {
+        arr.map(item => {
+          if (item.name && item.name === name) {
+            result.push(item)
+            return true
+          }
+          if (item.children && item.children.length) {
+            findNameObj(name, item.children, result)
+            return true
+          }
+        })
+        return result
+      }
+      const arr = findNameObj(name)
+      console.log(arr)
+    }
+  }
   // *点击之前还原
   restore(name) {
     if (name === 'usage') {
@@ -1481,23 +1501,6 @@ export default class Mjs3d {
         this.createBtn.usage = false
       }
     }
-  }
-  // *特定的方法
-  setTables() {
-    this.createObject({
-      uuid: '',
-      type: 'cube',
-      name: 'carpet',
-      width: 600,
-      depth: 800,
-      height: 2,
-      x: -2700,
-      y: 11,
-      z: 200,
-      skin: {
-        color: '#000'
-      }
-    })
   }
   // 生成Tube 管道缓冲几何体
   initTube(obj) {
@@ -1957,10 +1960,47 @@ export default class Mjs3d {
     monitor.add(group)
     this.addObject(monitor)
   }
+  //* 旋转 监视器
+  spinMonitor(value, key, index) {
+    const findObj = (name, source = this.sceneObject, result = []) => {
+      source.map(item => {
+        if (item.name === name) {
+          result.push(item)
+          return true
+        }
+        if (item.children && item.children.length) {
+          findObj(name, item.children, result)
+          return true
+        }
+      })
+      return result
+    }
+    const objArr = findObj('monitorSpin')
+    // 仰角
+    if (key === 'elevation') {
+      if (objArr.length) {
+        objArr[index].rotation.z = Math.sin(value)
+      }
+    }
+    // 转角
+    if (key === 'corner') {
+      if (objArr.length) {
+        objArr[index].rotation.y = value * Math.PI
+      }
+    }
+    // 远近
+    if (key === 'distance') {
+      if (this.monitorCamera[index]) {
+        const num = -300
+        this.monitorCamera[index].fov = num - (value * 25)
+        this.monitorCamera[index].updateProjectionMatrix()
+      }
+    }
+  }
   // * 消防箱
   addFireBox(x, y, z) {
     const group = new THREE.Group()
-    group.position.set(0, 45, 0)
+    group.position.set(-1450, 45, 600)
     group.name = 'firebox'
     // 箱体
     const geometry = new THREE.BufferGeometry()

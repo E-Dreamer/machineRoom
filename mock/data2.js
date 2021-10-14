@@ -5,7 +5,7 @@ const {
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-08 10:26:52
- * @LastEditTime: 2021-10-13 10:12:38
+ * @LastEditTime: 2021-10-14 16:41:00
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -916,7 +916,7 @@ const glassDoor = {
 const cabinet = {
   uuid: '',
   type: 'group',
-  name: 'cabinet_twopage',
+  name: 'cabinet',
   x: 0,
   y: 0,
   z: 0,
@@ -1081,7 +1081,7 @@ for (let i = 0; i < 8; i++) {
     cabinet.children.push({
       uuid: '',
       type: 'cabinet',
-      name: 'cabinet_twopage',
+      name: 'cabinet',
       width: 150,
       height: 400,
       depth: 150,

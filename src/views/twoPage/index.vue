@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-14 08:58:38
+ * @LastEditTime: 2021-10-14 16:58:52
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -15,7 +15,7 @@
 
       <div class="boxcontent">
         <div
-          v-for="item in contorlArr"
+          v-for="(item,index) in contorlArr"
           :key="item.id"
           :class="['childrenBox',item.enable || 'childrenBoxh20']"
         >
@@ -26,15 +26,15 @@
           <div class="content">
             <p class="slider">
               <span>仰角:</span>
-              <el-slider v-model="elevation" />
+              <el-slider v-model="item.elevation" :min="-1" :max="1" :step="0.001" @input="(val)=>input(val,'elevation',index)" />
             </p>
             <p class="slider">
               <span>转角:</span>
-              <el-slider v-model="corner" />
+              <el-slider v-model="item.corner" :min="-1" :max="1" :step="0.001" @input="(val)=>input(val,'corner',index)" />
             </p>
             <p class="slider">
               <span>远近:</span>
-              <el-slider v-model="distance" />
+              <el-slider v-model="item.distance" :min="-1" :max="1" :step="0.001" @input="(val)=>input(val,'distance',index)" />
             </p>
             <div>
               <p style="font-weight:700">当前监控画面预览</p>
@@ -47,11 +47,18 @@
         </div>
       </div>
     </div>
-
-    <div id="monitor" />
+    <!-- <div class="footer">
+      <el-button type="primary" size="mini" @click="property">资产</el-button>
+      <el-button type="primary" size="mini" @click="capacity">容量</el-button>
+    </div> -->
   </div>
 </template>
 <style lang="scss" scoped>
+.footer {
+  position: absolute;
+  bottom: 10px;
+  left:0;
+}
 .views {
   text-align: center;
 }
@@ -147,17 +154,13 @@
 <script>
 import Mjs3d from '@/threejs'
 import { getData } from '@/api/data2.js'
-
-// import floor from '@/assets/images/floor2.png'
 export default {
   data() {
     return {
       data: [],
       contorlArr: [],
-      boxEnable: true,
-      elevation: 0,
-      corner: 0,
-      distance: 0
+      boxEnable: true
+
     }
   },
   mounted() {
@@ -234,19 +237,28 @@ export default {
           x: -930,
           y: 400,
           z: 350,
-          id: 'monitor_1'
+          id: 'monitor_1',
+          elevation: 0,
+          corner: 0,
+          distance: 0
         },
         {
           x: -2980,
           y: 400,
           z: 400,
-          id: 'monitor_2'
+          id: 'monitor_2',
+          elevation: 0,
+          corner: 0,
+          distance: 0
         },
         {
           x: -800,
           y: 400,
           z: -1700,
-          id: 'monitor_3'
+          id: 'monitor_3',
+          elevation: 0,
+          corner: 0,
+          distance: 0
         },
         {
           x: 2980,
@@ -255,7 +267,10 @@ export default {
           id: 'monitor_4',
           rotate: {
             y: Math.PI
-          }
+          },
+          elevation: 0,
+          corner: 0,
+          distance: 0
         },
         {
           x: -2300,
@@ -264,7 +279,10 @@ export default {
           id: 'monitor_5',
           rotate: {
             y: -Math.PI / 2
-          }
+          },
+          elevation: 0,
+          corner: 0,
+          distance: 0
         }
       ]
 
@@ -272,9 +290,11 @@ export default {
         this.contorlArr.push({
           name: `摄像头${++index}`,
           id: item.id,
-          enable: false
+          enable: false,
+          elevation: item.elevation,
+          corner: item.corner,
+          distance: item.distance
         })
-
         this.$nextTick(() => {
           this.mjs3d.setMonitor(item)
         })
@@ -285,6 +305,15 @@ export default {
     },
     childFlot(item) {
       item.enable = !item.enable
+    },
+    input(val, key, item) {
+      this.mjs3d.spinMonitor(val, key, item)
+    },
+    property() {
+      this.mjs3d.restore('usage')
+    },
+    capacity() {
+      this.mjs3d.addUsage2('cabinet')
     }
   }
 }

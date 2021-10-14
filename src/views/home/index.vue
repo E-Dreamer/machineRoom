@@ -21,7 +21,7 @@
 }
 </style>
 <script>
-import Mjs3d from '@/threejs'
+import Mjs3d from './index.js'
 import { getData } from '@/api/data1.js'
 import { deepClone } from '@/utils'
 // 图片
