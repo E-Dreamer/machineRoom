@@ -27,6 +27,7 @@ function throttle(event, time) {
 export default class Mjs3d {
   constructor() {
     this.scene = null // 场景
+    this.RTscene = []
     this.controls = null // 控制
     this.renderer = null // 渲染器
     this.camera = null // 摄像机
@@ -35,8 +36,8 @@ export default class Mjs3d {
       domId: '#canvas',
       bgcolor: '#225f93'
     }
-    this.monitorCamera = null // 监视器摄像机
-    this.monitorRender = null // 监视器渲染器
+    this.monitorCamera = [] // 监视器摄像机
+    this.monitorRender = [] // 监视器渲染器
 
     this.stats = null
     this.point = null // 光源
@@ -1137,18 +1138,14 @@ export default class Mjs3d {
     camera.lookAt(this.scene.position) // 设置相机方向（指向场景对象）
     this.camera = camera
     this.sceneObject.push(this.camera)
-
-    // 监视器摄像头
-    this.monitorCamera = new THREE.PerspectiveCamera(45, 1, 1, 10000)
-    this.monitorCamera.position.set(-200, 460, 80)
-    this.monitorCamera.lookAt(0, 500, 2000)
-    var helper = new THREE.CameraHelper(this.monitorCamera)
-    this.sceneObject.push(helper)
   }
   // 控制器
   initContorls(params) {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-    // this.controls1 = new THREE.OrbitControls(this.monitorCamera, this.monitorRender.domElement);
+
+    // this.monitorCamera.forEach((item, index) => {
+    //   new THREE.OrbitControls(item, this.monitorRender[index].domElement)
+    // })
   }
   statsHelper() { // 性能插件
     this.stats = new Stats()
@@ -1201,17 +1198,14 @@ export default class Mjs3d {
       this.documentMouseClick(e, 'hover')
     }, 1000), false)
 
-    // this.monitorRender = new THREE.WebGLRenderer({
-    //   alpha: true,
-    //   antialias:true,
-    // })
-    // this.monitorRender.setSize(300,200);
-    // document.querySelector('#planform').appendChild(this.monitorRender.domElement)
     this.animation()
   }
   animation() {
     this.renderer.render(this.scene, this.camera)
-    // this.monitorRender.render(this.scene,this.monitorCamera)
+    this.monitorRender.forEach((item, index) => {
+      // 渲染控制面板里面的canvas
+      item.render(this.scene, this.monitorCamera[index])
+    })
     this.stats && this.stats.update()
     requestAnimationFrame(this.animation.bind(this))
     this.points && this.pointsAnimation()
@@ -1658,7 +1652,88 @@ export default class Mjs3d {
     })
   }
   //* 生成 监视器
-  setMonitor() {
+  setMonitor(obj) {
+    if (obj) {
+      var { x, y, z, rotate, id, cameraRotate, lookAt, cameraConfig } = obj
+    }
+    // 整个监视器组
+    const monitorObj = {
+      uuid: '',
+      name: 'monitor',
+      type: 'group',
+      x: x || -950,
+      y: y || 300,
+      z: z || 300,
+      rotate: rotate || {},
+      children: [
+        {
+          uuid: '',
+          name: 'monitor',
+          type: 'cube',
+          width: 10,
+          height: 50,
+          depth: 30,
+          x: 0,
+          y: 0,
+          z: 0,
+          skin: {
+            color: '#fff'
+          }
+        },
+        {
+          uuid: '',
+          type: 'cylinder',
+          name: 'monitor',
+          width: 15,
+          height: 15,
+          depth: 5,
+          x: 10,
+          y: 0,
+          z: 0,
+          skin: {
+            color: '#000'
+          },
+          rotate: {
+            z: Math.PI / 2
+          }
+        },
+        {
+          uuid: '',
+          name: 'monitor',
+          type: 'cylinder',
+          width: 5,
+          height: 5,
+          depth: 100,
+          x: 50,
+          y: 0,
+          z: 0,
+          skin: {
+            color: '#fff'
+          },
+          rotate: {
+            z: Math.PI / 2
+          }
+        },
+        {
+          uuid: '',
+          name: 'monitor',
+          type: 'cylinder',
+          width: 8,
+          height: 8,
+          depth: 50,
+          x: 100,
+          y: 10,
+          z: 0,
+          skin: {
+            color: '#fff'
+          }
+        }
+      ]
+    }
+
+    const monitor = this.initGroup(monitorObj)
+
+    // 监视器头组
     const group = new THREE.Group()
     group.position.set(100, 30, 0)
     group.name = 'monitorSpin'
@@ -1816,28 +1891,294 @@ export default class Mjs3d {
     ]
     const points = new Float32Array([...trape, ...monitorArr, ...shell])
     geometry.setAttribute('position', new THREE.BufferAttribute(points, 3))
-
-    const uvs = new Float32Array([
-      50, 10, 20,
-      70, 50, 20,
-      70, 50, -20,
-
-      50, 10, 20,
-      50, 10, -20,
-      70, 50, -20
-    ])
+    // 两种写法
+    // geometry.attributes.position  = new THREE.BufferAttribute(points1, 3)
     const material = this.commonFunc.setMaterials({
       color: '#eae9ee',
       side: THREE.DoubleSide
     })
     const mesh = new THREE.Mesh(geometry, material)
     group.add(mesh)
-    // this.addObject(group)
-    const monitor = this.commonFunc.findObject('monitor')
-    monitor.add(group)
-    console.log(monitor)
-  }
 
+    // 三角锥
+    const coneGeometry = new THREE.ConeGeometry(100, 300, 4, 1, true)
+    const coneMaterial = this.commonFunc.setMaterials({
+      transparent: true,
+      opacity: 0.8,
+      color: '#75a6da'
+    })
+    const coneMesh = new THREE.Mesh(coneGeometry, coneMaterial)
+    coneMesh.position.set(210, 30, 0)
+    coneMesh.rotateZ(Math.PI / 2)
+    coneMesh.rotateY(Math.PI / 4)
+    // 轮廓
+    const edges = new THREE.EdgesGeometry(coneGeometry)
+    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: '#75a6da' }))
+    line.position.set(210, 30, 0)
+    line.rotateZ(Math.PI / 2)
+    line.rotateY(Math.PI / 4)
+
+    // 监视器摄像头
+    const camera = new THREE.PerspectiveCamera(-300, 1, 1, 4000)
+    camera.position.set(400, 70, 0)
+    camera.lookAt(600, 70, 0)
+    group.add(camera)
+    // var helper = new THREE.CameraHelper(camera)
+    this.monitorCamera.push(camera)
+    // group.add(helper)
+
+    // 监视器渲染
+    const render = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true
+    })
+    render.setSize(180, 200)
+    document.querySelector(`#${id}`).appendChild(render.domElement)
+    this.monitorRender.push(render)
+
+    // 监视器前面的画面
+    // const renderCube = new THREE.WebGLRenderTarget(140, 140)
+    // const RTscene = new THREE.Scene()
+    // this.RTscene.push(RTscene)
+    const plane = new THREE.PlaneGeometry(140, 140)
+    const texture = new THREE.CanvasTexture(render.domElement)
+    const planeMaterial = this.commonFunc.setMaterials({
+      map: texture,
+      side: THREE.DoubleSide
+    })
+    const planeMesh = new THREE.Mesh(plane, planeMaterial)
+    planeMesh.position.set(360, 30, 0)
+    planeMesh.rotateY(Math.PI / 2)
+    group.add(planeMesh)
+
+    group.add(line)
+    group.add(coneMesh)
+
+    monitor.add(group)
+    this.addObject(monitor)
+  }
+  // * 消防箱
+  addFireBox(x, y, z) {
+    const group = new THREE.Group()
+    group.position.set(0, 45, 0)
+    group.name = 'firebox'
+    // 箱体
+    const geometry = new THREE.BufferGeometry()
+    const w = 70; const h1 = 130; const h2 = h1 - 20; const d = 80
+
+    const bottomH = 0
+    const points = new Float32Array([
+      // z轴正面 梯形
+      w / 2, bottomH, d / 2,
+      -(w / 2), bottomH, d / 2,
+      -(w / 2), h1, d / 2,
+
+      w / 2, bottomH, d / 2,
+      w / 2, h2, d / 2,
+      -(w / 2), h1, d / 2,
+
+      // z轴 反面
+      w / 2, bottomH, -d / 2,
+      -(w / 2), bottomH, -d / 2,
+      -(w / 2), h1, -d / 2,
+
+      w / 2, bottomH, -d / 2,
+      w / 2, h2, -d / 2,
+      -(w / 2), h1, -d / 2,
+
+      // x轴 正面
+      w / 2, bottomH, d / 2,
+      w / 2, bottomH, -d / 2,
+      w / 2, h2, -d / 2,
+
+      w / 2, bottomH, d / 2,
+      w / 2, h2, -d / 2,
+      w / 2, h2, d / 2,
+
+      // z轴 反面
+      -w / 2, bottomH, d / 2,
+      -w / 2, bottomH, -d / 2,
+      -w / 2, h1, -d / 2,
+
+      -w / 2, bottomH, d / 2,
+      -w / 2, h1, -d / 2,
+      -w / 2, h1, d / 2,
+
+      // y轴 正面
+      w / 2, h2, d / 2,
+      -w / 2, h1, d / 2,
+      -w / 2, h1, -d / 2,
+
+      w / 2, h2, d / 2,
+      w / 2, h2, -d / 2,
+      -w / 2, h1, -d / 2,
+
+      // y轴反面
+      w / 2, bottomH, d / 2,
+      -w / 2, bottomH, d / 2,
+      -w / 2, bottomH, -d / 2,
+
+      w / 2, bottomH, d / 2,
+      -w / 2, bottomH, -d / 2,
+      w / 2, bottomH, -d / 2
+    ])
+    geometry.setAttribute('position', new THREE.BufferAttribute(points, 3))
+    const material = this.commonFunc.setMaterials({
+      side: THREE.DoubleSide,
+      color: '#a51717'
+    })
+    const mesh = new THREE.Mesh(geometry, material)
+    group.add(mesh)
+
+    // 顶部盖子
+    const cube = this.initCube({
+      width: w + 10,
+      height: 5,
+      depth: d + 10,
+      x: 0,
+      y: h1 - 10,
+      z: 0,
+      skin: {
+        color: '#a51717'
+      },
+      rotate: {
+        z: -Math.PI / 10
+      }
+    })
+    group.add(cube)
+
+    // 前面的两块 贴图
+    const cube1 = this.initCube({
+      width: 5,
+      height: h2 / 2 - 10,
+      depth: d - 10,
+      x: w / 2 + 2,
+      y: h2 - (h2 / 2) / 2,
+      z: 0,
+      skin: {
+        color: '#a51717',
+        img: require('../assets/images/fire1.png')
+      }
+    })
+    group.add(cube1)
+
+    const cube2 = this.initCube({
+      width: 5,
+      height: h2 / 2 - 10,
+      depth: d - 10,
+      x: w / 2 + 2,
+      y: h2 / 4,
+      z: 0,
+      skin: {
+        color: '#a51717',
+        img: require('../assets/images/fire2.png')
+      }
+    })
+    group.add(cube2)
+
+    // 四个脚
+    const legW = 10
+    const legH = 20
+    const legD = 10
+
+    const arr = [
+      {
+        x: w / 2 - 10,
+        z: d / 2 - 10,
+        rotate: {
+          y: Math.PI
+        }
+      },
+      {
+        x: -w / 2 + 10,
+        z: d / 2 - 10
+      },
+      {
+        x: w / 2 - 10,
+        z: -d / 2 + 10,
+        rotate: {
+          y: Math.PI
+        }
+      },
+      {
+        x: -w / 2 + 10,
+        z: -d / 2 + 10
+      }
+    ]
+    arr.forEach(item => {
+      const legGroup = new THREE.Group()
+      legGroup.position.set(item.x, -legH, item.z)
+      item.rotate && this.commonFunc.setRotate(legGroup, item.rotate)
+      const legGeometry = new THREE.BufferGeometry()
+      const legPoints = new Float32Array([
+        // z轴 正面
+        -legW / 2, 0, legD / 2,
+        -legW / 2, legH, legD / 2,
+        legW / 2 + 10, legH, legD / 2,
+
+        -legW / 2, 0, legD / 2,
+        legW / 2 + 10, legH, legD / 2,
+        legW / 2, 0, legD / 2,
+
+        // z轴 反面
+        -legW / 2, 0, -legD / 2,
+        -legW / 2, legH, -legD / 2,
+        legW / 2 + 10, legH, -legD / 2,
+
+        -legW / 2, 0, -legD / 2,
+        legW / 2 + 10, legH, -legD / 2,
+        legW / 2, 0, -legD / 2,
+
+        // y轴 正面
+        -legW / 2, legH, legD / 2,
+        -legW / 2, legH, -legD / 2,
+        legW / 2 + 10, legH, -legD / 2,
+
+        -legW / 2, legH, legD / 2,
+        legW / 2 + 10, legH, -legD / 2,
+        legW / 2 + 10, legH, legD / 2,
+
+        // y轴 反面
+        -legW / 2, 0, legD / 2,
+        -legW / 2, 0, -legD / 2,
+        legW / 2, 0, -legD / 2,
+
+        -legW / 2, 0, legD / 2,
+        legW / 2, 0, -legD / 2,
+        legW / 2, 0, legD / 2,
+
+        // x轴 正面
+        legW / 2, 0, legD / 2,
+        legW / 2 + 10, legH, legD / 2,
+        legW / 2 + 10, legH, -legD / 2,
+
+        legW / 2, 0, legD / 2,
+        legW / 2 + 10, legH, -legD / 2,
+        legW / 2, 0, -legD / 2,
+        // x轴 反面
+        -legW / 2, 0, legD / 2,
+        -legW / 2, 0, -legD / 2,
+        -legW / 2, legH, -legD / 2,
+
+        -legW / 2, 0, legD / 2,
+        -legW / 2, legH, -legD / 2,
+        -legW / 2, legH, legD / 2
+      ])
+
+      legGeometry.setAttribute('position', new THREE.BufferAttribute(legPoints, 3))
+      const material1 = this.commonFunc.setMaterials({
+        side: THREE.DoubleSide,
+        color: '#a51717'
+      })
+      const mesh1 = new THREE.Mesh(legGeometry, material1)
+      legGroup.add(mesh1)
+
+      group.add(legGroup)
+    })
+
+    this.addObject(group)
+  }
+  //* 3d扇形轮播图
   addShapeDRN(obj) {
     // Arc circle圆弧drn
     /**
@@ -1897,7 +2238,6 @@ export default class Mjs3d {
     group.position.set(0, 0, 0)
 
     const texture = new THREE.TextureLoader().load(require('../assets/images/scene.png'))
-    console.log(texture)
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
     // texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
     texture.repeat.set(0.004, 0.001)

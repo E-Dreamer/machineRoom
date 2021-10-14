@@ -1,25 +1,137 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-12 15:41:41
+ * @LastEditTime: 2021-10-14 08:58:38
  * @LastEditors: E-Dreamer
  * @Description:
 -->
 <template>
   <div id="canvas">
-    <el-collapse
-      v-model="activeName"
-      accordion
-      class="collapse"
-    >
-      <el-collapse-item
-        title="摄像头控制面板"
-        name="1"
-      />
-    </el-collapse>
+    <div :class="['box',boxEnable|| 'boxh20']">
+      <div class="title">摄像头控制面板 <span
+        class="triangle"
+        @click="flot"
+      /></div>
+
+      <div class="boxcontent">
+        <div
+          v-for="item in contorlArr"
+          :key="item.id"
+          :class="['childrenBox',item.enable || 'childrenBoxh20']"
+        >
+          <div class="title">{{ item.name }} <span
+            :class="['triangle',!item.enable || 'triangle1']"
+            @click="childFlot(item)"
+          /></div>
+          <div class="content">
+            <p class="slider">
+              <span>仰角:</span>
+              <el-slider v-model="elevation" />
+            </p>
+            <p class="slider">
+              <span>转角:</span>
+              <el-slider v-model="corner" />
+            </p>
+            <p class="slider">
+              <span>远近:</span>
+              <el-slider v-model="distance" />
+            </p>
+            <div>
+              <p style="font-weight:700">当前监控画面预览</p>
+              <p
+                :id="item.id"
+                class="views"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="monitor" />
   </div>
 </template>
 <style lang="scss" scoped>
+.views {
+  text-align: center;
+}
+.slider {
+  display: flex;
+  align-items: center;
+  margin-left:10px;
+  span {
+    width:50px;
+  }
+}
+.el-slider {
+  flex:0.9
+}
+#monitor {
+  position: absolute;
+  width: 100;
+  height: 100;
+  right: 0;
+  top: 0;
+}
+.box {
+  max-height: 100%;
+  overflow-y: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  width: 250px;
+  height: auto;
+  background: rgba(150, 153, 161, 0.5);
+  .boxcontent {
+    height: auto;
+    overflow: hidden;
+    transition: all 0.1s linear;
+  }
+}
+.boxh20 {
+  .boxcontent {
+    height: 0;
+  }
+}
+.title {
+  padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  font-weight: 700;
+}
+.childrenBox {
+  margin-left: 2px;
+  background: rgba(150, 153, 161, 0.5);
+  .title {
+    background-color: rgba(182, 184, 189, 0.5);
+    border-bottom: 1px solid #43aff1;
+  }
+  .content {
+    display: block;
+    transition: height 0.1s linear;
+    overflow: hidden;
+  }
+}
+
+.childrenBoxh20 {
+  .content {
+    height: 0;
+  }
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid #868686;
+  margin-left: auto;
+}
+.triangle1 {
+  transform: rotate(180deg);
+}
 #canvas {
   position: relative;
   height: 100%;
@@ -41,7 +153,11 @@ export default {
   data() {
     return {
       data: [],
-      activeName: ''
+      contorlArr: [],
+      boxEnable: true,
+      elevation: 0,
+      corner: 0,
+      distance: 0
     }
   },
   mounted() {
@@ -63,9 +179,13 @@ export default {
         this.mjs3d.setPipeLine()
       }, 1000)
 
-      this.mjs3d.setMonitor()
+      setTimeout(() => {
+        this.createMonitor()
+      }, 1000)
 
-      this.mjs3d.addShapeDRN()
+      // this.mjs3d.addShapeDRN()
+
+      this.mjs3d.addFireBox()
     },
     joinImg(item) {
       const arr = ['skinUp', 'skinBottom', 'skinRight', 'skinLeft', 'skinFront', 'skinBack']
@@ -106,6 +226,65 @@ export default {
           this.joinImg(item.skin[key])
         })
       }
+    },
+    // 生成监视器
+    createMonitor() {
+      const arr = [
+        {
+          x: -930,
+          y: 400,
+          z: 350,
+          id: 'monitor_1'
+        },
+        {
+          x: -2980,
+          y: 400,
+          z: 400,
+          id: 'monitor_2'
+        },
+        {
+          x: -800,
+          y: 400,
+          z: -1700,
+          id: 'monitor_3'
+        },
+        {
+          x: 2980,
+          y: 400,
+          z: 1700,
+          id: 'monitor_4',
+          rotate: {
+            y: Math.PI
+          }
+        },
+        {
+          x: -2300,
+          y: 400,
+          z: -1980,
+          id: 'monitor_5',
+          rotate: {
+            y: -Math.PI / 2
+          }
+        }
+      ]
+
+      arr.forEach((item, index) => {
+        this.contorlArr.push({
+          name: `摄像头${++index}`,
+          id: item.id,
+          enable: false
+        })
+
+        this.$nextTick(() => {
+          this.mjs3d.setMonitor(item)
+        })
+      })
+    },
+    flot() {
+      this.boxEnable = !this.boxEnable
+    },
+    childFlot(item) {
+      item.enable = !item.enable
     }
   }
 }

@@ -5,7 +5,7 @@ const {
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-08 10:26:52
- * @LastEditTime: 2021-10-12 09:12:42
+ * @LastEditTime: 2021-10-13 10:12:38
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -1393,81 +1393,6 @@ teaTableLeg.forEach(item => {
 const teaTable2 = deepClone(teaTable)
 teaTable2.x = 5700
 
-// 监视器
-const monitor = [
-  {
-    uuid: '',
-    name: 'monitor',
-    type: 'group',
-    x: 10,
-    y: 300,
-    z: 100,
-    children: [
-      {
-        uuid: '',
-        name: 'monitor',
-        type: 'cube',
-        width: 10,
-        height: 50,
-        depth: 30,
-        x: 0,
-        y: 0,
-        z: 0,
-        skin: {
-          color: '#fff'
-        }
-      },
-      {
-        uuid: '',
-        type: 'cylinder',
-        name: 'monitor',
-        width: 15,
-        height: 15,
-        depth: 5,
-        x: 10,
-        y: 0,
-        z: 0,
-        skin: {
-          color: '#000'
-        },
-        rotate: {
-          z: Math.PI / 2
-        }
-      },
-      {
-        uuid: '',
-        name: 'monitor',
-        type: 'cylinder',
-        width: 5,
-        height: 5,
-        depth: 100,
-        x: 50,
-        y: 0,
-        z: 0,
-        skin: {
-          color: '#fff'
-        },
-        rotate: {
-          z: Math.PI / 2
-        }
-      },
-      {
-        uuid: '',
-        name: 'monitor',
-        type: 'cylinder',
-        width: 8,
-        height: 8,
-        depth: 50,
-        x: 100,
-        y: 10,
-        z: 0,
-        skin: {
-          color: '#fff'
-        }
-      }
-    ]
-  }
-]
 allObj.children = [
   wall,
   ...pillar,
@@ -1483,8 +1408,7 @@ allObj.children = [
   ...electricity,
   power,
   teaTable,
-  teaTable2,
-  ...monitor
+  teaTable2
 ]
 
 // 机箱
