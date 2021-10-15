@@ -71,7 +71,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'home',
-        component: () => import('@/views/home/index'),
+        component: () => import('@/views/home/index.vue'),
         name: '首页',
         meta: { title: '首页', icon: 'dashboard', affix: true }
       }
@@ -83,7 +83,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/twoPage/index'),
+        component: () => import('@/views/twoPage/index.vue'),
         name: '场景2',
         meta: { title: '场景2', icon: 'dashboard', affix: false }
       }

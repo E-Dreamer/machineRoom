@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-14 16:58:52
+ * @LastEditTime: 2021-10-15 10:38:43
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -47,10 +47,10 @@
         </div>
       </div>
     </div>
-    <!-- <div class="footer">
+    <div class="footer">
       <el-button type="primary" size="mini" @click="property">资产</el-button>
       <el-button type="primary" size="mini" @click="capacity">容量</el-button>
-    </div> -->
+    </div>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -152,7 +152,7 @@
 }
 </style>
 <script>
-import Mjs3d from '@/threejs'
+import Mjs3d from './index.js'
 import { getData } from '@/api/data2.js'
 export default {
   data() {
@@ -313,7 +313,7 @@ export default {
       this.mjs3d.restore('usage')
     },
     capacity() {
-      this.mjs3d.addUsage2('cabinet')
+      this.mjs3d.addUsage('cabinet')
     }
   }
 }
