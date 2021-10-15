@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-15 10:38:43
+ * @LastEditTime: 2021-10-15 16:40:19
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -157,23 +157,24 @@ import { getData } from '@/api/data2.js'
 export default {
   data() {
     return {
-      data: [],
+      // data: [],
       contorlArr: [],
       boxEnable: true
-
     }
   },
   mounted() {
-    this.mjs3d = new Mjs3d()
     this.render()
+  },
+  beforeDestroy() {
+    this.mjs3d.reset()
   },
   methods: {
     async render() {
+      this.mjs3d = new Mjs3d()
       this.mjs3d.init()
-
       const res = await getData()
-      this.data = res.data
-      this.data.forEach(item => {
+      // this.data = res.data
+      res.data.forEach(item => {
         this.joinImg(item)
         this.mjs3d.createObject(item)
       })

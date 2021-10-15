@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-14 15:44:04
- * @LastEditTime: 2021-10-15 10:36:10
+ * @LastEditTime: 2021-10-15 14:09:52
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -83,76 +83,5 @@ export default class Homes extends Mjs3d {
     group.add(cube)
 
     this.addObject(group)
-  }
-  /**
-   * @description: 展示容量
-   * @param {*} name 机柜的名称
-   * @return {*}
-   */
-  addUsage(name) {
-    if (!this.usage) {
-      this.usage = true
-      let parentGroup
-
-      const findNameObj = (arr) => {
-        arr.map(item => {
-          if (item.name.includes(name)) {
-            // item.children.length = 6 的时候 是创建的机柜 原本的组
-            if (item.type === 'Group' && item.children.length > 6) {
-              // 组的情况就要在group.children中找 制定的物体
-              // parentGroup = this.commonFunc.cloneObj(item)
-              // parentGroup.children = []
-              parentGroup = this.initGroup({
-                name: 'usage',
-                x: item.position.x,
-                y: item.position.y,
-                z: item.position.z
-              })
-              findNameObj(item.children)
-              return
-            }
-            let width, height, depth
-            if (item.children && item.children.length) {
-              // up y轴正方形的  front z轴 正方形
-              // 从up 中获取  depth
-              // 从front中获取 height
-              // width 两个中都可以获取到
-              const upMesh = item.children[0]
-              const Front = item.children[5]
-
-              width = upMesh.geometry && upMesh.geometry.parameters.width
-              depth = upMesh.geometry && upMesh.geometry.parameters.depth
-              height = Front.geometry && Front.geometry.parameters.height
-            }
-
-            this.setEsg(width, height, depth, item, parentGroup)
-          }
-        })
-      }
-      findNameObj(this.scene.children)
-
-      // 获取机柜列表 并移除
-      const arr = this.objects.filter(item => item.name === name)
-      arr && arr.length && arr.forEach(item => {
-        this.removeObject(item.name)
-      })
-    } else {
-      this.restore('usage')
-    }
-  }
-  // *点击之前还原
-  restore(name) {
-    if (name === 'usage') {
-      if (this.usage) {
-        // 移除当前生成的元素
-        this.removeObject('usage')
-        // 创建机柜
-        const arr = this.objects.filter(item => item.name === 'cabinet')
-        arr.forEach(item => {
-          this.createObject(item)
-        })
-        this.usage = false
-      }
-    }
   }
 }

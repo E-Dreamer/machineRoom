@@ -37,11 +37,11 @@ import cabintDoor from '@/assets/images/5.png'
 import cabintDoor1 from '@/assets/images/1.png'
 import cabintDoor2 from '@/assets/images/6.png'
 import air from '@/assets/images/2.png'
+
 export default {
   name: 'Home',
   data() {
     return {
-      mjs3d: null,
       wall: {
         uuid: '',
         name: 'wall',
@@ -330,11 +330,15 @@ export default {
     }
   },
   mounted() {
-    this.mjs3d = new Mjs3d()
     this.render()
+  },
+  beforeDestroy() {
+    this.mjs3d.reset()
+    this.mjs3d = null
   },
   methods: {
     render() {
+      this.mjs3d = new Mjs3d()
       this.mjs3d.init()
       // 渲染地板
       this.mjs3d.createObject(this.floor)

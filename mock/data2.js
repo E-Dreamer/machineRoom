@@ -5,7 +5,7 @@ const {
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-08 10:26:52
- * @LastEditTime: 2021-10-14 16:41:00
+ * @LastEditTime: 2021-10-15 13:30:08
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -1150,8 +1150,8 @@ const glassDoorAndCabinet = {
   y: 25,
   z: 3800,
   children: [
-    glassDoor,
-    cabinet
+    glassDoor
+    // cabinet
   ]
 }
 
@@ -1163,6 +1163,20 @@ const glassDoorAndCabinet2 = deepClone(glassDoorAndCabinet)
 glassDoorAndCabinet2.x = 5000
 glassDoorAndCabinet2.name = 'glassDoorAndCabinet2'
 
+// 机柜
+const cabinet1 = deepClone(cabinet)
+cabinet1.x = -2400
+cabinet1.z = 1800
+cabinet1.y = 25
+const cabinet2 = deepClone(cabinet)
+cabinet2.x = 1000
+cabinet2.z = 1800
+cabinet2.y = 25
+const cabinet3 = deepClone(cabinet)
+cabinet3.x = 2000
+cabinet3.z = 1800
+cabinet3.y = 25
+const cabinetArr = [cabinet1, cabinet2, cabinet3]
 // 保密柜
 const Confidential = []
 
@@ -1673,7 +1687,7 @@ leg.forEach(item => {
     })
   })
 })
-const data = [floor, allObj, ...air]
+const data = [floor, allObj, ...air, ...cabinetArr]
 module.exports = [{
   url: '/twoSceneData',
   type: 'get',

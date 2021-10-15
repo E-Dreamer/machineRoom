@@ -3,9 +3,8 @@ import * as THREE from 'three'
 import {
   OrbitControls
 } from 'three/examples/jsm/controls/OrbitControls'
-
 const ThreeBSP = require('three-js-csg')(THREE)
-
+import { OBJLoader, MTLLoader } from 'three-obj-mtl-loader'
 const TWEEN = require('@tweenjs/tween.js')
 
 import Stats from 'stats-js'
@@ -24,10 +23,71 @@ function throttle(event, time) {
     }
   }
 }
+
+// class ResourceTracker {
+//   constructor() {
+//     this.resources = new Set()
+//   }
+//   track(resource) {
+//     if (!resource) {
+//       return resource
+//     }
+//     if (Array.isArray(resource)) {
+//       resource.forEach(resource => this.track(resource))
+//       return resource
+//     }
+
+//     if (resource.dispose || resource instanceof THREE.Object3D) {
+//       this.resources.add(resource)
+//     }
+//     if (resource instanceof THREE.Object3D) {
+//       this.track(resource.geometry)
+//       this.track(resource.material)
+//       this.track(resource.children)
+//     } else if (resource instanceof THREE.Material) {
+//       for (const value of Object.values(resource)) {
+//         if (value instanceof THREE.Texture) {
+//           this.track(value)
+//         }
+//       }
+//       if (resource.uniforms) {
+//         for (const value of Object.values(resource.uniforms)) {
+//           if (value) {
+//             const uniformValue = value.value
+//             if (uniformValue instanceof THREE.Texture || Array.isArray(uniformValue)) {
+//               this.track(uniformValue)
+//             }
+//           }
+//         }
+//       }
+//     }
+//     return resource
+//   }
+//   untrack(resource) {
+//     this.resources.delete(resource)
+//   }
+//   dispose() {
+//     for (const resource of this.resources) {
+//       if (resource instanceof THREE.Object3D) {
+//         if (resource.parent) {
+//           resource.parent.remove(resource)
+//         }
+//       }
+
+//       if (resource.dispose) {
+//         resource.dispose()
+//       }
+//     }
+//     this.resources.clear()
+//   }
+// }
+// const resMgr = new ResourceTracker()
+// const track = resMgr.track.bind(resMgr)
 export default class Mjs3d {
   constructor() {
     this.scene = null // 场景
-    this.RTscene = []
+    this.renderEnabled = false
+    this.timeout = null
     this.controls = null // 控制
     this.renderer = null // 渲染器
     this.camera = null // 摄像机
@@ -63,7 +123,7 @@ export default class Mjs3d {
   onWindowResize() { // 自适应
     this.camera.aspect = window.innerWidth / window.innerHeight
     this.camera.updateProjectionMatrix()
-    this.renderer.setSize(window.innerWidth, window.innerHeight - 88)
+    this.renderer && this.renderer.setSize(window.innerWidth, window.innerHeight - 88)
   }
   init() {
     this.initScene()
@@ -74,7 +134,53 @@ export default class Mjs3d {
     this.statsHelper() // 性能辅助
     this.initAxisHelper()
     this.initObject()
+    this.timeRender()
     window.addEventListener('resize', this.onWindowResize.bind(this), false)
+  }
+  // 重置
+  reset() {
+    this.renderer.dispose()
+    this.renderer.forceContextLoss()
+    // this.renderer.context = null
+    // this.renderer.domElement = null
+    const disposeChild = (mesh) => {
+      if (mesh instanceof THREE.Mesh) {
+        if (mesh.geometry?.dispose) {
+          mesh.geometry.dispose() // 删除几何体
+        }
+        if (mesh.material?.dispose) {
+          mesh.material.dispose() // 删除材质
+        }
+        if (mesh.material?.texture?.dispose) {
+          mesh.material.texture.dispose()
+        }
+      }
+      if (mesh instanceof THREE.Group) {
+        // mesh.clear()
+      }
+      if (mesh instanceof THREE.Object3D) {
+        // mesh.clear()
+      }
+    }
+    this.scene?.traverse(item => {
+      disposeChild(item)
+    })
+    this.scene.children = []
+    THREE.Cache.clear()
+    this.renderer = null
+    this.renderEnabled = false
+    this.timeout = null
+    this.controls = null
+    this.scene = null
+    this.camera = null
+    this.monitorCamera = []
+    this.monitorRender = []
+    this.objects = []
+    this.sceneObject = []
+    this.stats = null
+    this.point = null
+    this.light = null
+    cancelAnimationFrame(this.animation)
   }
   // 公用方法
   commonFunc = {
@@ -155,7 +261,7 @@ export default class Mjs3d {
   initAxisHelper() {
     //  红色代表 X 轴. 绿色代表 Y 轴. 蓝色代表 Z 轴.
     var axisHelper = new THREE.AxisHelper(1200)
-    this.scene.add(axisHelper)
+    this.scene && this.scene.add(axisHelper)
   }
   // 生成所有物体
   initObject() {
@@ -204,13 +310,19 @@ export default class Mjs3d {
   addObject(obj) {
     // Object.prototype.toString.call(obj) [object,Array] [object,Object]
     this.sceneObject.push(obj)
-    this.scene.add(obj)
+    this.scene && this.scene.add(obj)
   }
   // * 移除物体
   removeObject(name) {
     const _obj = this.scene.getObjectByName(name)
-
     // 删除场景中的元素
+    if (!_obj) return
+
+    _obj.traverse(item => {
+      if (item instanceof THREE.Mesh) {
+        item.geometry && item.geometry.dispose()// 删除几何体
+      }
+    })
     this.scene.remove(_obj)
     // 删除objects中的值
     const _index = this.sceneObject.indexOf(_obj)
@@ -230,11 +342,11 @@ export default class Mjs3d {
     }
     this.objects = [...this.objects, ...data]
     // 数组去重
-    const obj = {}
-    this.objects = this.objects.reduce((item, next) => {
-      obj[next.name] ? '' : obj[next.name] = true && item.push(next)
-      return item
-    }, [])
+    // const obj = {}
+    // this.objects = this.objects.reduce((item, next) => {
+    //   obj[next.name] ? '' : obj[next.name] = true && item.push(next)
+    //   return item
+    // }, [])
     this.objectFn(data)
   }
   // 创建多边形
@@ -1042,14 +1154,14 @@ export default class Mjs3d {
       name
     } = obj
     const _this = this
-    const OBJLoader = new THREE.OBJLoader() // obj加载器
-    const MTLLoader = new THREE.MTLLoader() // 材质文件加载器
-    MTLLoader.load(`./images/${mtlImg}`, function(materials) {
+    const objLoader = new OBJLoader() // obj加载器
+    const mtlLoader = new MTLLoader() // 材质文件加载器
+    mtlLoader.load(`./images/${mtlImg}`, function(materials) {
       // 返回一个包含材质的对象MaterialCreator
       // console.log(materials);
       // obj的模型会和MaterialCreator包含的材质对应起来
-      OBJLoader.setMaterials(materials)
-      OBJLoader.load(`./images/${objImg}`, function(obj) {
+      objLoader.setMaterials(materials)
+      objLoader.load(`./images/${objImg}`, function(obj) {
         scale && obj.scale.set(scale.x, scale.y, scale.z) // 放大obj组对象
         rotate && _this.commonFunc.setRotate(obj, rotate)
         obj.position.set(x, y, z)
@@ -1132,16 +1244,16 @@ export default class Mjs3d {
     var point = new THREE.PointLight(0xffffff, 1, 100, 2)
     point.position.set(0, 600, 0) // 点光源位置
     // point.castShadow = true;
-    this.scene.add(point)
+    this.scene && this.scene.add(point)
     this.point = point
     //  环境光
     var ambient = new THREE.AmbientLight(0x444444)
-    this.scene.add(ambient)
+    this.scene && this.scene.add(ambient)
 
     var light = new THREE.DirectionalLight(0xffffff, 0.8)
     light.position.set(0, 500, 0)
     light.castShadow = true
-    this.scene.add(light)
+    this.scene && this.scene.add(light)
   }
   initCamera() {
     // 相机设置
@@ -1156,7 +1268,7 @@ export default class Mjs3d {
   }
   // 控制器
   initContorls(params) {
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+    this.controls = this.renderer && new OrbitControls(this.camera, this.renderer.domElement)
 
     // this.monitorCamera.forEach((item, index) => {
     //   new THREE.OrbitControls(item, this.monitorRender[index].domElement)
@@ -1204,29 +1316,41 @@ export default class Mjs3d {
     renderer.setSize(this.width, this.height)
     renderer.setClearColor(this.baseConfig.bgcolor, 1)
     renderer.shadowMap.enabled = true // 开启阴影计算
-    document.querySelector(this.baseConfig.domId).appendChild(renderer.domElement) // 在特定的id下渲染
+    if (document.querySelector(this.baseConfig.domId)) {
+      document.querySelector(this.baseConfig.domId).appendChild(renderer.domElement) // 在特定的id下渲染
+    }
     this.renderer = renderer
-    this.renderer.domElement.addEventListener('click', throttle((e) => {
-      this.documentMouseClick(e, 'click')
-    }, 1000), false)
-    this.renderer.domElement.addEventListener('mousemove', throttle((e) => {
-      this.documentMouseClick(e, 'hover')
-    }, 1000), false)
+    if (this.renderer) {
+      this.renderer.domElement.addEventListener('click', throttle((e) => {
+        this.documentMouseClick(e, 'click')
+      }, 1000), false)
+      this.renderer.domElement.addEventListener('mousemove', throttle((e) => {
+        this.documentMouseClick(e, 'hover')
+      }, 1000), false)
+    }
 
     this.animation()
   }
   animation() {
-    this.renderer.render(this.scene, this.camera)
-    this.monitorRender.forEach((item, index) => {
+    if (this.renderEnabled) {
+      this.renderer && this.renderer.render(this.scene, this.camera)
+      this.monitorRender.forEach((item, index) => {
       // 渲染控制面板里面的canvas
-      item.render(this.scene, this.monitorCamera[index])
-    })
+        item && item.render(this.scene, this.monitorCamera[index])
+      })
+    }
     this.stats && this.stats.update()
     requestAnimationFrame(this.animation.bind(this))
-    this.points && this.pointsAnimation()
     if (TWEEN != null && typeof TWEEN !== 'undefined') {
       TWEEN.update()
     }
+  }
+  timeRender(time = 3000) {
+    this.renderEnabled = true
+    clearTimeout(this.timeout)
+    this.timeout = setTimeout(() => {
+      this.renderEnabled = false
+    }, time)
   }
   /**
    * @description: 开门
@@ -1369,6 +1493,15 @@ export default class Mjs3d {
     return edgesLine
   }
   // !type 分为 group组 或者 直接添加到scene下的
+  /**
+   * @description: 生成轮廓以及内容
+   * @param {*} width
+   * @param {*} height
+   * @param {*} depth
+   * @param {*} _obj
+   * @param {*} group
+   * @return {*}
+   */
   setEsg(width, height, depth, _obj, group) {
     const esgobj = {
       uuid: '',
@@ -1428,43 +1561,6 @@ export default class Mjs3d {
     }
   }
 
-  addUsage2(name) {
-    if (!this.createBtn.usage) {
-      this.createBtn.usage = true
-      const arr = this.commonFunc.findAllObject(name)
-      console.log(arr)
-      const parentGroup = []
-      const digui = (arr) => {
-        arr.forEach(item => {
-          if (item.children && item.children.length) {
-            if (!item.specific) {
-              parentGroup.push(this.initGroup({
-                name: 'usage',
-                x: item.position.x,
-                y: item.position.y,
-                z: item.position.z
-              }))
-            }
-            digui(item.children)
-          }
-          // 这是cabinet自身的组
-          if (item.specific === '机柜') {
-            console.log(parentGroup)
-            const upMesh = item.children[0]
-            const Front = item.children[5]
-
-            const width = upMesh.geometry && upMesh.geometry.parameters.width
-            const depth = upMesh.geometry && upMesh.geometry.parameters.depth
-            const height = Front.geometry && Front.geometry.parameters.height
-
-            // setEsg(width, height, depth, item, parentGroup)
-          }
-        })
-      }
-
-      digui(arr)
-    }
-  }
   // 生成Tube 管道缓冲几何体
   initTube(obj) {
     const {
@@ -1497,6 +1593,79 @@ export default class Mjs3d {
     }
 
     return path
+  }
+  /**
+   * @description: 展示容量
+   * @param {*} name 机柜的名称
+   * @return {*}
+   */
+  addUsage(name) {
+    if (!this.createBtn.usage) {
+      this.createBtn.usage = true
+      let parentGroup
+
+      const findNameObj = (arr) => {
+        arr.map(item => {
+          if (item.name.includes(name)) {
+            // item.children.length = 6 的时候 是创建的机柜 原本的组
+            if (item.type === 'Group' && item.children.length > 6) {
+              // 组的情况就要在group.children中找 制定的物体
+              // parentGroup = this.commonFunc.cloneObj(item)
+              // parentGroup.children = []
+              parentGroup = this.initGroup({
+                name: 'usage',
+                x: item.position.x,
+                y: item.position.y,
+                z: item.position.z
+              })
+              findNameObj(item.children)
+              return
+            }
+            let width, height, depth
+            if (item.children && item.children.length) {
+              // up y轴正方形的  front z轴 正方形
+              // 从up 中获取  depth
+              // 从front中获取 height
+              // width 两个中都可以获取到
+              const upMesh = item.children[0]
+              const Front = item.children[5]
+
+              width = upMesh.geometry && upMesh.geometry.parameters.width
+              depth = upMesh.geometry && upMesh.geometry.parameters.depth
+              height = Front.geometry && Front.geometry.parameters.height
+            }
+
+            this.setEsg(width, height, depth, item, parentGroup)
+          }
+        })
+      }
+      findNameObj(this.scene.children)
+
+      // 获取机柜列表 并移除
+      const arr = this.objects.filter(item => item.name === name)
+      arr && arr.length && arr.forEach(item => {
+        this.removeObject(item.name)
+      })
+    } else {
+      this.restore('usage')
+    }
+  }
+  // *点击之前还原
+  restore(name) {
+    if (name === 'usage') {
+      if (this.createBtn.usage) {
+        const arr = this.objects.filter(item => item.name === 'cabinet')
+        // 这必须重置objects 否则会一直重复创建
+        this.objects = this.objects.filter(item => item.name !== 'cabinet')
+        arr.forEach(item => {
+          // 移除当前生成的元素
+          this.removeObject('usage')
+          // 创建机柜
+          this.createObject(item)
+        })
+        this.createBtn.usage = false
+      }
+    }
   }
   //* 3d扇形轮播图
   addShapeDRN(obj) {

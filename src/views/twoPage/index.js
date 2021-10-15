@@ -3,7 +3,7 @@ import * as THREE from 'three'
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-15 10:32:29
- * @LastEditTime: 2021-10-15 10:47:08
+ * @LastEditTime: 2021-10-15 16:19:02
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -413,7 +413,7 @@ export default class Twopage extends Mjs3d {
       antialias: true
     })
     render.setSize(180, 200)
-    document.querySelector(`#${id}`).appendChild(render.domElement)
+    document.querySelector(`#${id}`) && document.querySelector(`#${id}`).appendChild(render.domElement)
     this.monitorRender.push(render)
 
     // 监视器前面的画面
@@ -457,12 +457,14 @@ export default class Twopage extends Mjs3d {
     if (key === 'elevation') {
       if (objArr.length) {
         objArr[index].rotation.z = Math.sin(value)
+        this.timeRender()
       }
     }
     // 转角
     if (key === 'corner') {
       if (objArr.length) {
         objArr[index].rotation.y = value * Math.PI
+        this.timeRender()
       }
     }
     // 远近
@@ -471,6 +473,7 @@ export default class Twopage extends Mjs3d {
         const num = -300
         this.monitorCamera[index].fov = num - (value * 25)
         this.monitorCamera[index].updateProjectionMatrix()
+        this.timeRender()
       }
     }
   }
@@ -694,20 +697,5 @@ export default class Twopage extends Mjs3d {
     })
 
     this.addObject(group)
-  }
-  addUsage(name) {
-    const findobj = (name, source = this.sceneObject, result = []) => {
-      source.map(item => {
-        if (item.name && item.name.includes(name)) {
-          result.push(item)
-          return true
-        }
-        if (item.children && item.children.length) {
-          findobj(name, item.children, result)
-          return true
-        }
-      })
-    }
-    console.log(findobj(name))
   }
 }
