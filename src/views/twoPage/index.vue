@@ -1,12 +1,12 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-18 08:55:01
+ * @LastEditTime: 2021-10-18 10:28:35
  * @LastEditors: E-Dreamer
  * @Description:
 -->
 <template>
-  <div id="canvas">
+  <div id="twopage">
     <div :class="['box',boxEnable|| 'boxh20']">
       <div class="title">摄像头控制面板 <span
         class="triangle"
@@ -139,7 +139,7 @@
 .triangle1 {
   transform: rotate(180deg);
 }
-#canvas {
+#twopage {
   position: relative;
   height: 100%;
   width: 100%;
@@ -190,6 +190,8 @@ export default {
       // this.mjs3d.addShapeDRN()
 
       this.mjs3d.addFireBox()
+
+      this.mjs3d.setChair()
     },
     joinImg(item) {
       const arr = ['skinUp', 'skinBottom', 'skinRight', 'skinLeft', 'skinFront', 'skinBack']

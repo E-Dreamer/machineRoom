@@ -334,7 +334,6 @@ export default {
   },
   beforeDestroy() {
     this.mjs3d.reset()
-    this.mjs3d = null
   },
   methods: {
     render() {

@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2021-09-29 13:34:08
- * @LastEditTime: 2021-10-08 10:11:39
+ * @LastEditTime: 2021-10-18 13:31:16
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -29,6 +29,12 @@ const mouseEvent = {
       obj_name: 'rigthDoor1',
       obj_event(obj) {
         this.openDoor(obj, 'right', { degflag: '+', diraction: 'x' })
+      }
+    },
+    {
+      obj_name: 'cabinet_door123',
+      obj_event(obj) {
+        this.openDoor(obj, 'right', { degflag: '+', diraction: 'x', way: 'None' })
       }
     },
     {

@@ -121,8 +121,10 @@ export default class Mjs3d {
     }
   }
   onWindowResize() { // 自适应
-    this.camera.aspect = window.innerWidth / window.innerHeight
-    this.camera.updateProjectionMatrix()
+    if (this.camera) {
+      this.camera.aspect = window.innerWidth / window.innerHeight
+      this.camera.updateProjectionMatrix()
+    }
     this.renderer && this.renderer.setSize(window.innerWidth, window.innerHeight - 88)
   }
   init() {
@@ -142,8 +144,10 @@ export default class Mjs3d {
     this.renderer.renderLists.dispose()
     this.renderer.dispose()
     this.renderer.forceContextLoss()
+    this.renderer.info.reset()
+    this.renderer.clear()
     // this.renderer.context = null
-    // this.renderer.domElement = null
+    this.renderer.domElement = null
     const disposeChild = (mesh) => {
       if (mesh.geometry?.dispose) {
         mesh.geometry.dispose() // 删除几何体
@@ -154,20 +158,28 @@ export default class Mjs3d {
       if (mesh.material?.texture?.dispose) {
         mesh.material.texture.dispose() // 删除贴图
       }
+      if (mesh.material) {
+        if (Array.isArray(mesh.material)) {
+          mesh.material.forEach(item => {
+            item?.map?.dispose()
+          })
+        }
+        mesh.material?.map?.dispose && mesh.material.map.dispose()
+      }
     }
     this.scene?.traverse(item => {
       disposeChild(item)
     })
 
     THREE.Cache.clear()
+    this.monitorCamera = []
+    this.monitorRender = []
     this.renderer = null
     this.renderEnabled = false
     this.timeout = null
     this.controls = null
     this.scene = null
     this.camera = null
-    this.monitorCamera = []
-    this.monitorRender = []
     this.objects = []
     this.sceneObject = []
     this.stats = null
@@ -1325,15 +1337,19 @@ export default class Mjs3d {
     this.animation()
   }
   animation() {
+    if (this.renderer) {
+      requestAnimationFrame(this.animation.bind(this))
+      this.renderer.render(this.scene, this.camera)
+    }
     if (this.renderEnabled) {
-      this.renderer && this.renderer.render(this.scene, this.camera)
       this.monitorRender.forEach((item, index) => {
       // 渲染控制面板里面的canvas
         item && item.render(this.scene, this.monitorCamera[index])
       })
     }
+
     this.stats && this.stats.update()
-    requestAnimationFrame(this.animation.bind(this))
+
     if (TWEEN != null && typeof TWEEN !== 'undefined') {
       TWEEN.update()
     }

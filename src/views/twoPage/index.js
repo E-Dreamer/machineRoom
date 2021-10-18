@@ -3,7 +3,7 @@ import * as THREE from 'three'
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-15 10:32:29
- * @LastEditTime: 2021-10-18 08:54:20
+ * @LastEditTime: 2021-10-18 11:22:10
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -11,6 +11,7 @@ export default class Twopage extends Mjs3d {
   constructor(...args) {
     super(...args)
     this.usage = false
+    this.baseConfig.domId = '#twopage'
   }
   // * 生成管道的方法
   setPipeLine() {
@@ -696,6 +697,31 @@ export default class Twopage extends Mjs3d {
       group.add(legGroup)
     })
 
+    this.addObject(group)
+  }
+  //* 生成椅子
+  setChair() {
+    const group = this.initGroup({
+      name: 'chair',
+      x: 0,
+      y: 200,
+      z: 0
+    })
+    const shape = new THREE.Shape()
+      .moveTo(-20, 200)
+      .quadraticCurveTo(20, 200, 22, 180)
+      .lineTo(22, 100)
+      .quadraticCurveTo(24, 100, 50, 0)
+
+    // .lineTo(20, 200)
+    // .lineTo(22, 180)
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth: 100, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 })
+
+    const mesh = new THREE.Mesh(geometry, this.commonFunc.setMaterials({
+      side: THREE.DoubleSide
+    }))
+    mesh.position.set(0, 0, 0)
+    group.add(mesh)
     this.addObject(group)
   }
 }

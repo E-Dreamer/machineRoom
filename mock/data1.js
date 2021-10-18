@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2021-09-28 10:35:16
- * @LastEditTime: 2021-09-30 14:27:33
+ * @LastEditTime: 2021-10-18 13:30:48
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -212,7 +212,7 @@ for (let i = 0; i <= 4; i++) {
   cabinet.push({
     uuid: '',
     type: 'cube',
-    name: 'cabinet_door',
+    name: 'cabinet_door123',
     width: 280,
     height: 180,
     depth: 20,
