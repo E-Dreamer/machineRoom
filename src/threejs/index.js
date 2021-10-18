@@ -139,33 +139,26 @@ export default class Mjs3d {
   }
   // 重置
   reset() {
+    this.renderer.renderLists.dispose()
     this.renderer.dispose()
     this.renderer.forceContextLoss()
     // this.renderer.context = null
     // this.renderer.domElement = null
     const disposeChild = (mesh) => {
-      if (mesh instanceof THREE.Mesh) {
-        if (mesh.geometry?.dispose) {
-          mesh.geometry.dispose() // 删除几何体
-        }
-        if (mesh.material?.dispose) {
-          mesh.material.dispose() // 删除材质
-        }
-        if (mesh.material?.texture?.dispose) {
-          mesh.material.texture.dispose()
-        }
+      if (mesh.geometry?.dispose) {
+        mesh.geometry.dispose() // 删除几何体
       }
-      if (mesh instanceof THREE.Group) {
-        // mesh.clear()
+      if (mesh.material?.dispose) {
+        mesh.material.dispose()// 删除材质
       }
-      if (mesh instanceof THREE.Object3D) {
-        // mesh.clear()
+      if (mesh.material?.texture?.dispose) {
+        mesh.material.texture.dispose() // 删除贴图
       }
     }
     this.scene?.traverse(item => {
       disposeChild(item)
     })
-    this.scene.children = []
+
     THREE.Cache.clear()
     this.renderer = null
     this.renderEnabled = false
