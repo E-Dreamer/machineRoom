@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-14 15:44:04
- * @LastEditTime: 2021-10-15 14:09:52
+ * @LastEditTime: 2021-10-19 09:42:15
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -82,6 +82,22 @@ export default class Homes extends Mjs3d {
     })
     group.add(cube)
 
+    // const leg = this.initTube({
+    //   name: 'leg',
+    //   pathArr: [
+    //     [0, 0, -50],
+    //     [0, 100, -50],
+    //     [0, 80, -20],
+    //     [0, 80, 20],
+    //     [0, 100, 50],
+    //     [0, 0, 50]
+    //   ],
+    //   radius: 5,
+    //   skin: {
+    //     color: '#c2815e'
+    //   }
+    // })
+    // group.add(leg)
     this.addObject(group)
   }
 }

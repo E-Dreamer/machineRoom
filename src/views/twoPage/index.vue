@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-18 10:28:35
+ * @LastEditTime: 2021-10-18 14:10:45
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -141,7 +141,7 @@
 }
 #twopage {
   position: relative;
-  height: 100%;
+  height: calc(100vh - 88px);
   width: 100%;
 }
 .collapse {
@@ -171,7 +171,7 @@ export default {
   methods: {
     async render() {
       this.mjs3d = new Mjs3d()
-      this.mjs3d.init()
+      this.mjs3d.init(document.getElementById('twopage'))
       const res = await getData()
       // this.data = res.data
       res.data.forEach(item => {
@@ -190,8 +190,6 @@ export default {
       // this.mjs3d.addShapeDRN()
 
       this.mjs3d.addFireBox()
-
-      this.mjs3d.setChair()
     },
     joinImg(item) {
       const arr = ['skinUp', 'skinBottom', 'skinRight', 'skinLeft', 'skinFront', 'skinBack']

@@ -9,8 +9,6 @@ const TWEEN = require('@tweenjs/tween.js')
 
 import Stats from 'stats-js'
 
-import store from '@/store'
-
 import mouseEvent from './btn'
 
 // 节流
@@ -23,66 +21,6 @@ function throttle(event, time) {
     }
   }
 }
-
-// class ResourceTracker {
-//   constructor() {
-//     this.resources = new Set()
-//   }
-//   track(resource) {
-//     if (!resource) {
-//       return resource
-//     }
-//     if (Array.isArray(resource)) {
-//       resource.forEach(resource => this.track(resource))
-//       return resource
-//     }
-
-//     if (resource.dispose || resource instanceof THREE.Object3D) {
-//       this.resources.add(resource)
-//     }
-//     if (resource instanceof THREE.Object3D) {
-//       this.track(resource.geometry)
-//       this.track(resource.material)
-//       this.track(resource.children)
-//     } else if (resource instanceof THREE.Material) {
-//       for (const value of Object.values(resource)) {
-//         if (value instanceof THREE.Texture) {
-//           this.track(value)
-//         }
-//       }
-//       if (resource.uniforms) {
-//         for (const value of Object.values(resource.uniforms)) {
-//           if (value) {
-//             const uniformValue = value.value
-//             if (uniformValue instanceof THREE.Texture || Array.isArray(uniformValue)) {
-//               this.track(uniformValue)
-//             }
-//           }
-//         }
-//       }
-//     }
-//     return resource
-//   }
-//   untrack(resource) {
-//     this.resources.delete(resource)
-//   }
-//   dispose() {
-//     for (const resource of this.resources) {
-//       if (resource instanceof THREE.Object3D) {
-//         if (resource.parent) {
-//           resource.parent.remove(resource)
-//         }
-//       }
-
-//       if (resource.dispose) {
-//         resource.dispose()
-//       }
-//     }
-//     this.resources.clear()
-//   }
-// }
-// const resMgr = new ResourceTracker()
-// const track = resMgr.track.bind(resMgr)
 export default class Mjs3d {
   constructor() {
     this.scene = null // 场景
@@ -94,6 +32,7 @@ export default class Mjs3d {
     // 基本配置
     this.baseConfig = {
       domId: '#canvas',
+      $el: null,
       bgcolor: '#225f93'
     }
     this.monitorCamera = [] // 监视器摄像机
@@ -102,8 +41,8 @@ export default class Mjs3d {
     this.stats = null
     this.point = null // 光源
     this.light = null // 太阳光
-    this.width = window.innerWidth - (store.getters.sidebar.opened ? 210 : 54)
-    this.height = window.innerHeight - 88
+    this.width = window.innerWidth
+    this.height = window.innerHeight
     this.btns = [] // 按钮组
     this.objects = [] // 所有要生成的物体数据
     this.sceneObject = [] // 场景里的物体
@@ -122,12 +61,15 @@ export default class Mjs3d {
   }
   onWindowResize() { // 自适应
     if (this.camera) {
-      this.camera.aspect = window.innerWidth / window.innerHeight
+      this.camera.aspect = this.baseConfig.$el.clientWidth / this.baseConfig.$el.clientHeight
       this.camera.updateProjectionMatrix()
     }
-    this.renderer && this.renderer.setSize(window.innerWidth, window.innerHeight - 88)
+    this.renderer && this.renderer.setSize(this.baseConfig.$el.clientWidth, this.baseConfig.$el.clientHeight)
   }
-  init() {
+  init($el) {
+    this.baseConfig.$el = $el
+    this.width = this.baseConfig.$el.clientWidth
+    this.height = this.baseConfig.$el.clientHeight
     this.initScene()
     this.initLight()
     this.initCamera()
@@ -1289,7 +1231,8 @@ export default class Mjs3d {
       item.style.width = '100px'
       item.style.height = '60px'
     })
-    document.querySelector(this.baseConfig.domId).appendChild(this.stats.domElement)
+    // document.querySelector(this.baseConfig.domId).appendChild(this.stats.domElement)
+    this.baseConfig.$el.appendChild(this.stats.domElement)
   }
   mouseCommon(event) {
     event.preventDefault()
@@ -1321,9 +1264,7 @@ export default class Mjs3d {
     renderer.setSize(this.width, this.height)
     renderer.setClearColor(this.baseConfig.bgcolor, 1)
     renderer.shadowMap.enabled = true // 开启阴影计算
-    if (document.querySelector(this.baseConfig.domId)) {
-      document.querySelector(this.baseConfig.domId).appendChild(renderer.domElement) // 在特定的id下渲染
-    }
+    this.baseConfig.$el.appendChild(renderer.domElement) // 在特定的id下渲染
     this.renderer = renderer
     if (this.renderer) {
       this.renderer.domElement.addEventListener('click', throttle((e) => {

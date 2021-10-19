@@ -5,7 +5,7 @@ const {
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-08 10:26:52
- * @LastEditTime: 2021-10-15 13:30:08
+ * @LastEditTime: 2021-10-18 16:28:20
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -887,6 +887,61 @@ for (let i = 0; i < 3; i++) {
   table.push(clone)
   table.push(cloneCom)
 }
+const computerDesk = {
+  type: 'group',
+  x: 2400,
+  y: 200,
+  z: 3650,
+  name: 'computer',
+  children: [
+    {
+      type: 'cube',
+      width: 120,
+      height: 10,
+      depth: 60,
+      x: 0,
+      y: 0,
+      z: 0,
+      skin: {
+        skinUp: {
+          img: 'computerDesk.png'
+        }
+      }
+    },
+    {
+      type: 'cube',
+      width: 60,
+      height: 10,
+      depth: 60,
+      x: 0,
+      y: 0,
+      z: 100
+    },
+    {
+      type: 'cube',
+      width: 10,
+      height: 100,
+      depth: 10,
+      x: 0,
+      y: 50,
+      z: 120
+    },
+    {
+      type: 'cube',
+      width: 200,
+      height: 150,
+      depth: 10,
+      x: 0,
+      y: 100,
+      z: 110,
+      skin: {
+        skinLeft: {
+          img: 'computer1.jpg'
+        }
+      }
+    }
+  ]
+}
 for (let i = 0; i < 2; i++) {
   const clone = deepClone(aloneTable)
   clone.x = [2800, 2400][i]
@@ -897,6 +952,7 @@ for (let i = 0; i < 2; i++) {
   cloneCom.rotate = {
     y: Math.PI
   }
+  table.push(computerDesk)
   table.push(clone)
   table.push(cloneCom)
 }

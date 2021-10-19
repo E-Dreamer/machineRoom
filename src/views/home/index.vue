@@ -11,7 +11,7 @@
 <style lang="scss" scoped>
 #canvas {
   position: relative;
-  height: 100%;
+  height: calc(100vh - 88px);
   width: 100%;
 }
 .footer {
@@ -338,7 +338,7 @@ export default {
   methods: {
     render() {
       this.mjs3d = new Mjs3d()
-      this.mjs3d.init()
+      this.mjs3d.init(document.getElementById('canvas'))
       // 渲染地板
       this.mjs3d.createObject(this.floor)
       // this.mjs3d.createObject(this.floor1)
