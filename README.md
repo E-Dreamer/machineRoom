@@ -192,6 +192,27 @@ gltf-pipeline -i xxx.gltf -o xxx.gltf -d
         //数据配置
     ]
 }
+# type 为 objloader | gltfload 时 为加载3d模型
+  对应的方法为 initObjLoader | initGLTF      
+推荐使用gltf文件 因为obj文件过大 转换为gltf且可以再次压缩
+{
+ uuid:"",
+ type:'objloader | gltfload',
+ // 为objloader需要
+ objImg:'',
+ mtlImg:'', //可传
+ // type 为 gltfload
+ gltfImg:'',
+ rotate:{x,y,z},
+ scale:{x,y,z},
+ loadEndFn:(obj)=>{
+   //obj为当前加载的物体 可用于克隆相同的物体
+ }
+ name:"",
+ x:0,
+ y:0,
+ z:0,
+}
 ```
 
 #### btn 物体点击事件配置

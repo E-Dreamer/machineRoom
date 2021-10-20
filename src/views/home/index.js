@@ -1,7 +1,7 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-14 15:44:04
- * @LastEditTime: 2021-10-20 13:19:59
+ * @LastEditTime: 2021-10-20 15:16:34
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -84,22 +84,57 @@ export default class Homes extends Mjs3d {
     })
     group.add(cube)
 
-    // const leg = this.initTube({
-    //   name: 'leg',
-    //   pathArr: [
-    //     [0, 0, -50],
-    //     [0, 100, -50],
-    //     [0, 80, -20],
-    //     [0, 80, 20],
-    //     [0, 100, 50],
-    //     [0, 0, 50]
-    //   ],
-    //   radius: 5,
-    //   skin: {
-    //     color: '#c2815e'
-    //   }
-    // })
-    // group.add(leg)
+    // 生成椅子
+    this.initGLTF({
+      name: 'chair',
+      gltfImg: '/smallchair/smallchair.gltf',
+      x: -2900,
+      y: 170,
+      z: 0,
+      scale: { x: 0.3, y: 0.3, z: 0.3 },
+      rotate: {
+        y: Math.PI / 2
+      },
+      loadEndFn: (obj) => {
+        const arr = [
+          {
+            x: -2900,
+            z: 200
+          },
+          {
+            x: -2900,
+            z: 400
+          },
+          {
+            x: -2500,
+            z: 0,
+            rotate: {
+              y: Math.PI
+            }
+          },
+          {
+            x: -2500,
+            z: 200,
+            rotate: {
+              y: -Math.PI * 1.2
+            }
+          },
+          {
+            x: -2500,
+            z: 400,
+            rotate: {
+              y: Math.PI
+            }
+          }
+        ]
+        arr.forEach(item => {
+          const mesh = obj.clone()
+          mesh.position.set(item.x, 170, item.z)
+          item.rotate && this.commonFunc.setRotate(mesh, item.rotate)
+          this.addObject(mesh)
+        })
+      }
+    })
     this.addObject(group)
   }
 }

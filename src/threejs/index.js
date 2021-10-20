@@ -1141,7 +1141,8 @@ export default class Mjs3d {
       mtlImg,
       scale,
       rotate,
-      name
+      name,
+      loadEndFn
     } = obj
     const _this = this
     const objLoader = new OBJLoader() // obj加载器
@@ -1164,7 +1165,7 @@ export default class Mjs3d {
           rotate && _this.commonFunc.setRotate(obj, rotate)
           obj.position.set(x, y, z)
           obj.name = name
-
+          loadEndFn && loadEndFn(obj)
           console.log((new Date().getTime() / 1000) - old + ' s')
           _this.addObject(obj) // 返回的组对象插入场景中
         })
