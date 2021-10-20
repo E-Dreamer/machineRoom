@@ -3,7 +3,7 @@ import * as THREE from 'three'
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-15 10:32:29
- * @LastEditTime: 2021-10-19 09:41:24
+ * @LastEditTime: 2021-10-20 10:49:02
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -27,7 +27,8 @@ export default class Twopage extends Mjs3d {
       x: 4050,
       y: 400,
       z: 2700
-    }, {
+    },
+    {
       x: 5050,
       y: 400,
       z: 2700
@@ -45,8 +46,12 @@ export default class Twopage extends Mjs3d {
             new THREE.Vector3(i === 0 ? 130 + 40 : -130, 100, -30 + j * 150),
             new THREE.Vector3(i === 0 ? 50 + 40 : -50, 150, 0 + j * 150),
             new THREE.Vector3(i === 0 ? 20 + 40 : -20, 180, 0 + j * 150),
-            i === 0 ? new THREE.Vector3(40, 200, 0 + j * 150) : new THREE.Vector3(0, 200, 0 + j * 150),
-            i === 0 ? new THREE.Vector3(30, 220, 0 + j * 150) : new THREE.Vector3(10, 220, 0 + j * 150)
+            i === 0
+              ? new THREE.Vector3(40, 200, 0 + j * 150)
+              : new THREE.Vector3(0, 200, 0 + j * 150),
+            i === 0
+              ? new THREE.Vector3(30, 220, 0 + j * 150)
+              : new THREE.Vector3(10, 220, 0 + j * 150)
           ])
           const geometry = new THREE.TubeGeometry(path, 64, 10, 8, false)
           const material = new THREE.MeshBasicMaterial({
@@ -135,7 +140,16 @@ export default class Twopage extends Mjs3d {
   //* 生成 监视器
   setMonitor(obj) {
     if (obj) {
-      var { x, y, z, rotate, id, cameraRotate, lookAt, cameraConfig } = obj
+      var {
+        x,
+        y,
+        z,
+        rotate,
+        id,
+        cameraRotate,
+        lookAt,
+        cameraConfig
+      } = obj
     }
     // 整个监视器组
     const monitorObj = {
@@ -146,69 +160,68 @@ export default class Twopage extends Mjs3d {
       y: y || 300,
       z: z || 300,
       rotate: rotate || {},
-      children: [
-        {
-          uuid: '',
-          name: 'monitor',
-          type: 'cube',
-          width: 10,
-          height: 50,
-          depth: 30,
-          x: 0,
-          y: 0,
-          z: 0,
-          skin: {
-            color: '#fff'
-          }
-        },
-        {
-          uuid: '',
-          type: 'cylinder',
-          name: 'monitor',
-          width: 15,
-          height: 15,
-          depth: 5,
-          x: 10,
-          y: 0,
-          z: 0,
-          skin: {
-            color: '#000'
-          },
-          rotate: {
-            z: Math.PI / 2
-          }
-        },
-        {
-          uuid: '',
-          name: 'monitor',
-          type: 'cylinder',
-          width: 5,
-          height: 5,
-          depth: 100,
-          x: 50,
-          y: 0,
-          z: 0,
-          skin: {
-            color: '#fff'
-          },
-          rotate: {
-            z: Math.PI / 2
-          }
-        },
-        {
-          uuid: '',
-          name: 'monitor',
-          type: 'cylinder',
-          width: 8,
-          height: 8,
-          depth: 50,
-          x: 100,
-          y: 10,
-          z: 0,
-          skin: {
-            color: '#fff'
-          }
+      children: [{
+        uuid: '',
+        name: 'monitor',
+        type: 'cube',
+        width: 10,
+        height: 50,
+        depth: 30,
+        x: 0,
+        y: 0,
+        z: 0,
+        skin: {
+          color: '#fff'
         }
+      },
+      {
+        uuid: '',
+        type: 'cylinder',
+        name: 'monitor',
+        width: 15,
+        height: 15,
+        depth: 5,
+        x: 10,
+        y: 0,
+        z: 0,
+        skin: {
+          color: '#000'
+        },
+        rotate: {
+          z: Math.PI / 2
+        }
+      },
+      {
+        uuid: '',
+        name: 'monitor',
+        type: 'cylinder',
+        width: 5,
+        height: 5,
+        depth: 100,
+        x: 50,
+        y: 0,
+        z: 0,
+        skin: {
+          color: '#fff'
+        },
+        rotate: {
+          z: Math.PI / 2
+        }
+      },
+      {
+        uuid: '',
+        name: 'monitor',
+        type: 'cylinder',
+        width: 8,
+        height: 8,
+        depth: 50,
+        x: 100,
+        y: 10,
+        z: 0,
+        skin: {
+          color: '#fff'
+        }
+      }
       ]
     }
 
@@ -223,152 +236,356 @@ export default class Twopage extends Mjs3d {
     // 底座
     const trape = [
       // 梯形
-      0, 0, 15,
-      -15, 5, 15,
-      -15, 10, 15,
+      0,
+      0,
+      15,
+      -15,
+      5,
+      15,
+      -15,
+      10,
+      15,
 
-      0, 0, 15,
-      -15, 10, 15,
-      15, 10, 15,
+      0,
+      0,
+      15,
+      -15,
+      10,
+      15,
+      15,
+      10,
+      15,
 
-      0, 0, 15,
-      15, 10, 15,
-      15, 5, 15,
+      0,
+      0,
+      15,
+      15,
+      10,
+      15,
+      15,
+      5,
+      15,
 
       // 梯形
-      0, 0, -15,
-      -15, 5, -15,
-      -15, 10, -15,
+      0,
+      0,
+      -15,
+      -15,
+      5,
+      -15,
+      -15,
+      10,
+      -15,
 
-      0, 0, -15,
-      -15, 10, -15,
-      15, 10, -15,
+      0,
+      0,
+      -15,
+      -15,
+      10,
+      -15,
+      15,
+      10,
+      -15,
 
-      0, 0, -15,
-      15, 10, -15,
-      15, 5, -15,
+      0,
+      0,
+      -15,
+      15,
+      10,
+      -15,
+      15,
+      5,
+      -15,
 
       // 梯形前面两个正方形
-      15, 5, 15,
-      0, 0, 15,
-      0, 0, -15,
+      15,
+      5,
+      15,
+      0,
+      0,
+      15,
+      0,
+      0,
+      -15,
 
-      15, 5, 15,
-      0, 0, -15,
-      15, 5, -15,
+      15,
+      5,
+      15,
+      0,
+      0,
+      -15,
+      15,
+      5,
+      -15,
 
-      15, 5, 15,
-      15, 10, 15,
-      15, 10, -15,
+      15,
+      5,
+      15,
+      15,
+      10,
+      15,
+      15,
+      10,
+      -15,
 
-      15, 5, 15,
-      15, 10, -15,
-      15, 5, -15,
+      15,
+      5,
+      15,
+      15,
+      10,
+      -15,
+      15,
+      5,
+      -15,
 
-      -15, 5, 15,
-      0, 0, 15,
-      0, 0, -15,
+      -15,
+      5,
+      15,
+      0,
+      0,
+      15,
+      0,
+      0,
+      -15,
 
-      -15, 5, 15,
-      0, 0, -15,
-      -15, 5, -15,
+      -15,
+      5,
+      15,
+      0,
+      0,
+      -15,
+      -15,
+      5,
+      -15,
 
-      -15, 5, 15,
-      -15, 10, 15,
-      -15, 10, -15,
+      -15,
+      5,
+      15,
+      -15,
+      10,
+      15,
+      -15,
+      10,
+      -15,
 
-      -15, 5, 15,
-      -15, 10, -15,
-      -15, 5, -15,
+      -15,
+      5,
+      15,
+      -15,
+      10,
+      -15,
+      -15,
+      5,
+      -15,
 
-      15, 10, 15,
-      15, 10, -15,
-      -15, 10, -15,
+      15,
+      10,
+      15,
+      15,
+      10,
+      -15,
+      -15,
+      10,
+      -15,
 
-      15, 10, 15,
-      -15, 10, -15,
-      -15, 10, 15
+      15,
+      10,
+      15,
+      -15,
+      10,
+      -15,
+      -15,
+      10,
+      15
     ]
     // 监视器内部
     const monitorArr = [
-      50, 10, 20,
-      -50, 10, 20,
-      -50, 50, 20,
+      50,
+      10,
+      20,
+      -50,
+      10,
+      20,
+      -50,
+      50,
+      20,
 
-      50, 10, 20,
-      -50, 50, 20,
-      70, 50, 20,
+      50,
+      10,
+      20,
+      -50,
+      50,
+      20,
+      70,
+      50,
+      20,
 
-      50, 10, -20,
-      -50, 10, -20,
-      -50, 50, -20,
+      50,
+      10,
+      -20,
+      -50,
+      10,
+      -20,
+      -50,
+      50,
+      -20,
 
-      50, 10, -20,
-      -50, 50, -20,
-      70, 50, -20,
+      50,
+      10,
+      -20,
+      -50,
+      50,
+      -20,
+      70,
+      50,
+      -20,
 
       // 顶面
-      -50, 50, 20,
-      -50, 50, -20,
-      70, 50, -20,
+      -50,
+      50,
+      20,
+      -50,
+      50,
+      -20,
+      70,
+      50,
+      -20,
 
-      -50, 50, 20,
-      70, 50, 20,
-      70, 50, -20,
+      -50,
+      50,
+      20,
+      70,
+      50,
+      20,
+      70,
+      50,
+      -20,
 
       // 背面
-      -50, 10, 20,
-      -50, 50, 20,
-      -50, 50, -20,
+      -50,
+      10,
+      20,
+      -50,
+      50,
+      20,
+      -50,
+      50,
+      -20,
 
-      -50, 10, 20,
-      -50, 10, -20,
-      -50, 50, -20,
+      -50,
+      10,
+      20,
+      -50,
+      10,
+      -20,
+      -50,
+      50,
+      -20,
       // 底部
-      -50, 10, 20,
-      -50, 10, -20,
-      50, 10, -20,
+      -50,
+      10,
+      20,
+      -50,
+      10,
+      -20,
+      50,
+      10,
+      -20,
 
-      -50, 10, 20,
-      50, 10, 20,
-      50, 10, -20,
+      -50,
+      10,
+      20,
+      50,
+      10,
+      20,
+      50,
+      10,
+      -20,
 
       // 需要贴图的面
-      50, 10, 20,
-      70, 50, 20,
-      70, 50, -20,
+      50,
+      10,
+      20,
+      70,
+      50,
+      20,
+      70,
+      50,
+      -20,
 
-      50, 10, 20,
-      50, 10, -20,
-      70, 50, -20
+      50,
+      10,
+      20,
+      50,
+      10,
+      -20,
+      70,
+      50,
+      -20
     ]
 
     // 外壳
     const shell = [
-      75, 25, 22,
-      -62, 25, 22,
-      -62, 55, 22,
+      75,
+      25,
+      22,
+      -62,
+      25,
+      22,
+      -62,
+      55,
+      22,
 
-      75, 25, 22,
-      90, 55, 22,
-      -62, 55, 22,
+      75,
+      25,
+      22,
+      90,
+      55,
+      22,
+      -62,
+      55,
+      22,
 
-      75, 25, -22,
-      -62, 25, -22,
-      -62, 55, -22,
+      75,
+      25,
+      -22,
+      -62,
+      25,
+      -22,
+      -62,
+      55,
+      -22,
 
-      75, 25, -22,
-      90, 55, -22,
-      -62, 55, -22,
+      75,
+      25,
+      -22,
+      90,
+      55,
+      -22,
+      -62,
+      55,
+      -22,
 
       // 顶部
-      90, 55, 22,
-      -62, 55, 22,
-      -62, 55, -22,
+      90,
+      55,
+      22,
+      -62,
+      55,
+      22,
+      -62,
+      55,
+      -22,
 
-      90, 55, 22,
-      -62, 55, -22,
-      90, 55, -22
+      90,
+      55,
+      22,
+      -62,
+      55,
+      -22,
+      90,
+      55,
+      -22
     ]
     const points = new Float32Array([...trape, ...monitorArr, ...shell])
     geometry.setAttribute('position', new THREE.BufferAttribute(points, 3))
@@ -394,7 +611,12 @@ export default class Twopage extends Mjs3d {
     coneMesh.rotateY(Math.PI / 4)
     // 轮廓
     const edges = new THREE.EdgesGeometry(coneGeometry)
-    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: '#75a6da' }))
+    const line = new THREE.LineSegments(
+      edges,
+      new THREE.LineBasicMaterial({
+        color: '#75a6da'
+      })
+    )
     line.position.set(210, 30, 0)
     line.rotateZ(Math.PI / 2)
     line.rotateY(Math.PI / 4)
@@ -414,7 +636,8 @@ export default class Twopage extends Mjs3d {
       antialias: true
     })
     render.setSize(180, 200)
-    document.querySelector(`#${id}`) && document.querySelector(`#${id}`).appendChild(render.domElement)
+    document.querySelector(`#${id}`) &&
+      document.querySelector(`#${id}`).appendChild(render.domElement)
     this.monitorRender.push(render)
 
     // 监视器前面的画面
@@ -472,7 +695,7 @@ export default class Twopage extends Mjs3d {
     if (key === 'distance') {
       if (this.monitorCamera[index]) {
         const num = -300
-        this.monitorCamera[index].fov = num - (value * 25)
+        this.monitorCamera[index].fov = num - value * 25
         this.monitorCamera[index].updateProjectionMatrix()
         this.timeRender()
       }
@@ -485,63 +708,138 @@ export default class Twopage extends Mjs3d {
     group.name = 'firebox'
     // 箱体
     const geometry = new THREE.BufferGeometry()
-    const w = 70; const h1 = 130; const h2 = h1 - 20; const d = 80
+    const w = 70
+    const h1 = 130
+    const h2 = h1 - 20
+    const d = 80
 
     const bottomH = 0
     const points = new Float32Array([
       // z轴正面 梯形
-      w / 2, bottomH, d / 2,
-      -(w / 2), bottomH, d / 2,
-      -(w / 2), h1, d / 2,
+      w / 2,
+      bottomH,
+      d / 2,
+      -(w / 2),
+      bottomH,
+      d / 2,
+      -(w / 2),
+      h1,
+      d / 2,
 
-      w / 2, bottomH, d / 2,
-      w / 2, h2, d / 2,
-      -(w / 2), h1, d / 2,
+      w / 2,
+      bottomH,
+      d / 2,
+      w / 2,
+      h2,
+      d / 2,
+      -(w / 2),
+      h1,
+      d / 2,
 
       // z轴 反面
-      w / 2, bottomH, -d / 2,
-      -(w / 2), bottomH, -d / 2,
-      -(w / 2), h1, -d / 2,
+      w / 2,
+      bottomH,
+      -d / 2,
+      -(w / 2),
+      bottomH,
+      -d / 2,
+      -(w / 2),
+      h1,
+      -d / 2,
 
-      w / 2, bottomH, -d / 2,
-      w / 2, h2, -d / 2,
-      -(w / 2), h1, -d / 2,
+      w / 2,
+      bottomH,
+      -d / 2,
+      w / 2,
+      h2,
+      -d / 2,
+      -(w / 2),
+      h1,
+      -d / 2,
 
       // x轴 正面
-      w / 2, bottomH, d / 2,
-      w / 2, bottomH, -d / 2,
-      w / 2, h2, -d / 2,
+      w / 2,
+      bottomH,
+      d / 2,
+      w / 2,
+      bottomH,
+      -d / 2,
+      w / 2,
+      h2,
+      -d / 2,
 
-      w / 2, bottomH, d / 2,
-      w / 2, h2, -d / 2,
-      w / 2, h2, d / 2,
+      w / 2,
+      bottomH,
+      d / 2,
+      w / 2,
+      h2,
+      -d / 2,
+      w / 2,
+      h2,
+      d / 2,
 
       // z轴 反面
-      -w / 2, bottomH, d / 2,
-      -w / 2, bottomH, -d / 2,
-      -w / 2, h1, -d / 2,
+      -w / 2,
+      bottomH,
+      d / 2,
+      -w / 2,
+      bottomH,
+      -d / 2,
+      -w / 2,
+      h1,
+      -d / 2,
 
-      -w / 2, bottomH, d / 2,
-      -w / 2, h1, -d / 2,
-      -w / 2, h1, d / 2,
+      -w / 2,
+      bottomH,
+      d / 2,
+      -w / 2,
+      h1,
+      -d / 2,
+      -w / 2,
+      h1,
+      d / 2,
 
       // y轴 正面
-      w / 2, h2, d / 2,
-      -w / 2, h1, d / 2,
-      -w / 2, h1, -d / 2,
+      w / 2,
+      h2,
+      d / 2,
+      -w / 2,
+      h1,
+      d / 2,
+      -w / 2,
+      h1,
+      -d / 2,
 
-      w / 2, h2, d / 2,
-      w / 2, h2, -d / 2,
-      -w / 2, h1, -d / 2,
+      w / 2,
+      h2,
+      d / 2,
+      w / 2,
+      h2,
+      -d / 2,
+      -w / 2,
+      h1,
+      -d / 2,
 
       // y轴反面
-      w / 2, bottomH, d / 2,
-      -w / 2, bottomH, d / 2,
-      -w / 2, bottomH, -d / 2,
+      w / 2,
+      bottomH,
+      d / 2,
+      -w / 2,
+      bottomH,
+      d / 2,
+      -w / 2,
+      bottomH,
+      -d / 2,
 
-      w / 2, bottomH, d / 2,
-      -w / 2, bottomH, -d / 2,
-      w / 2, bottomH, -d / 2
+      w / 2,
+      bottomH,
+      d / 2,
+      -w / 2,
+      bottomH,
+      -d / 2,
+      w / 2,
+      bottomH,
+      -d / 2
     ])
     geometry.setAttribute('position', new THREE.BufferAttribute(points, 3))
     const material = this.commonFunc.setMaterials({
@@ -574,7 +872,7 @@ export default class Twopage extends Mjs3d {
       height: h2 / 2 - 10,
       depth: d - 10,
       x: w / 2 + 2,
-      y: h2 - (h2 / 2) / 2,
+      y: h2 - h2 / 2 / 2,
       z: 0,
       skin: {
         color: '#a51717',
@@ -602,29 +900,28 @@ export default class Twopage extends Mjs3d {
     const legH = 20
     const legD = 10
 
-    const arr = [
-      {
-        x: w / 2 - 10,
-        z: d / 2 - 10,
-        rotate: {
-          y: Math.PI
-        }
-      },
-      {
-        x: -w / 2 + 10,
-        z: d / 2 - 10
-      },
-      {
-        x: w / 2 - 10,
-        z: -d / 2 + 10,
-        rotate: {
-          y: Math.PI
-        }
-      },
-      {
-        x: -w / 2 + 10,
-        z: -d / 2 + 10
+    const arr = [{
+      x: w / 2 - 10,
+      z: d / 2 - 10,
+      rotate: {
+        y: Math.PI
       }
+    },
+    {
+      x: -w / 2 + 10,
+      z: d / 2 - 10
+    },
+    {
+      x: w / 2 - 10,
+      z: -d / 2 + 10,
+      rotate: {
+        y: Math.PI
+      }
+    },
+    {
+      x: -w / 2 + 10,
+      z: -d / 2 + 10
+    }
     ]
     arr.forEach(item => {
       const legGroup = new THREE.Group()
@@ -633,60 +930,135 @@ export default class Twopage extends Mjs3d {
       const legGeometry = new THREE.BufferGeometry()
       const legPoints = new Float32Array([
         // z轴 正面
-        -legW / 2, 0, legD / 2,
-        -legW / 2, legH, legD / 2,
-        legW / 2 + 10, legH, legD / 2,
+        -legW / 2,
+        0,
+        legD / 2,
+        -legW / 2,
+        legH,
+        legD / 2,
+        legW / 2 + 10,
+        legH,
+        legD / 2,
 
-        -legW / 2, 0, legD / 2,
-        legW / 2 + 10, legH, legD / 2,
-        legW / 2, 0, legD / 2,
+        -legW / 2,
+        0,
+        legD / 2,
+        legW / 2 + 10,
+        legH,
+        legD / 2,
+        legW / 2,
+        0,
+        legD / 2,
 
         // z轴 反面
-        -legW / 2, 0, -legD / 2,
-        -legW / 2, legH, -legD / 2,
-        legW / 2 + 10, legH, -legD / 2,
+        -legW / 2,
+        0,
+        -legD / 2,
+        -legW / 2,
+        legH,
+        -legD / 2,
+        legW / 2 + 10,
+        legH,
+        -legD / 2,
 
-        -legW / 2, 0, -legD / 2,
-        legW / 2 + 10, legH, -legD / 2,
-        legW / 2, 0, -legD / 2,
+        -legW / 2,
+        0,
+        -legD / 2,
+        legW / 2 + 10,
+        legH,
+        -legD / 2,
+        legW / 2,
+        0,
+        -legD / 2,
 
         // y轴 正面
-        -legW / 2, legH, legD / 2,
-        -legW / 2, legH, -legD / 2,
-        legW / 2 + 10, legH, -legD / 2,
+        -legW / 2,
+        legH,
+        legD / 2,
+        -legW / 2,
+        legH,
+        -legD / 2,
+        legW / 2 + 10,
+        legH,
+        -legD / 2,
 
-        -legW / 2, legH, legD / 2,
-        legW / 2 + 10, legH, -legD / 2,
-        legW / 2 + 10, legH, legD / 2,
+        -legW / 2,
+        legH,
+        legD / 2,
+        legW / 2 + 10,
+        legH,
+        -legD / 2,
+        legW / 2 + 10,
+        legH,
+        legD / 2,
 
         // y轴 反面
-        -legW / 2, 0, legD / 2,
-        -legW / 2, 0, -legD / 2,
-        legW / 2, 0, -legD / 2,
+        -legW / 2,
+        0,
+        legD / 2,
+        -legW / 2,
+        0,
+        -legD / 2,
+        legW / 2,
+        0,
+        -legD / 2,
 
-        -legW / 2, 0, legD / 2,
-        legW / 2, 0, -legD / 2,
-        legW / 2, 0, legD / 2,
+        -legW / 2,
+        0,
+        legD / 2,
+        legW / 2,
+        0,
+        -legD / 2,
+        legW / 2,
+        0,
+        legD / 2,
 
         // x轴 正面
-        legW / 2, 0, legD / 2,
-        legW / 2 + 10, legH, legD / 2,
-        legW / 2 + 10, legH, -legD / 2,
+        legW / 2,
+        0,
+        legD / 2,
+        legW / 2 + 10,
+        legH,
+        legD / 2,
+        legW / 2 + 10,
+        legH,
+        -legD / 2,
 
-        legW / 2, 0, legD / 2,
-        legW / 2 + 10, legH, -legD / 2,
-        legW / 2, 0, -legD / 2,
+        legW / 2,
+        0,
+        legD / 2,
+        legW / 2 + 10,
+        legH,
+        -legD / 2,
+        legW / 2,
+        0,
+        -legD / 2,
         // x轴 反面
-        -legW / 2, 0, legD / 2,
-        -legW / 2, 0, -legD / 2,
-        -legW / 2, legH, -legD / 2,
+        -legW / 2,
+        0,
+        legD / 2,
+        -legW / 2,
+        0,
+        -legD / 2,
+        -legW / 2,
+        legH,
+        -legD / 2,
 
-        -legW / 2, 0, legD / 2,
-        -legW / 2, legH, -legD / 2,
-        -legW / 2, legH, legD / 2
+        -legW / 2,
+        0,
+        legD / 2,
+        -legW / 2,
+        legH,
+        -legD / 2,
+        -legW / 2,
+        legH,
+        legD / 2
       ])
 
-      legGeometry.setAttribute('position', new THREE.BufferAttribute(legPoints, 3))
+      legGeometry.setAttribute(
+        'position',
+        new THREE.BufferAttribute(legPoints, 3)
+      )
       const material1 = this.commonFunc.setMaterials({
         side: THREE.DoubleSide,
         color: '#a51717'
@@ -700,28 +1072,78 @@ export default class Twopage extends Mjs3d {
     this.addObject(group)
   }
   //* 生成椅子
-  setChair() {
-    const group = this.initGroup({
+  setChairAndSofa() {
+    this.initGLTF({
+      x: -600,
+      y: 160,
+      z: 1500,
       name: 'chair',
-      x: 0,
-      y: 200,
-      z: 0
+      rotate: {
+        x: -Math.PI / 2
+      },
+      loadEndFn: (obj) => {
+        const arr = [
+          {
+            x: -200,
+            z: 1500
+          },
+          {
+            x: 0,
+            z: -1400,
+            rotate: {
+              z: Math.PI
+            }
+          },
+          {
+            x: 400,
+            z: -1400,
+            rotate: {
+              z: Math.PI
+            }
+          },
+          {
+            x: 800,
+            z: -1400,
+            rotate: {
+              z: Math.PI
+            }
+          }
+        ]
+        arr.forEach(item => {
+          const mesh1 = obj.clone()
+          mesh1.position.set(item.x, 160, item.z)
+          item.rotate && this.commonFunc.setRotate(mesh1, item.rotate)
+          this.addObject(mesh1)
+        })
+      },
+      gltfImg: '/chair/chair2.gltf'
     })
-    const shape = new THREE.Shape()
-      .moveTo(-20, 200)
-      .quadraticCurveTo(20, 200, 22, 180)
-      .lineTo(22, 100)
-      .quadraticCurveTo(24, 100, 50, 0)
 
-    // .lineTo(20, 200)
-    // .lineTo(22, 180)
-    const geometry = new THREE.ExtrudeGeometry(shape, { depth: 100, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 })
+    this.initObjLoader({
+      name: 'sofa',
+      x: 2500,
+      y: 0,
+      z: -1850,
+      objImg: '/sofa/sofa.obj',
+      mtlImg: '/sofa/sofa.mtl',
+      scale: {
+        x: 8,
+        y: 8,
+        z: 6
+      }
+    })
 
-    const mesh = new THREE.Mesh(geometry, this.commonFunc.setMaterials({
-      side: THREE.DoubleSide
-    }))
-    mesh.position.set(0, 0, 0)
-    group.add(mesh)
-    this.addObject(group)
+    // this.initGLTF({
+    //   name: 'sofa',
+    //   x: 2500,
+    //   y: 150,
+    //   z: -1850,
+    //   gltfImg: '/sofa/sofa2.gltf',
+    //   scale: {
+    //     x: 8,
+    //     y: 8,
+    //     z: 6
+    //   }
+    // })
   }
 }

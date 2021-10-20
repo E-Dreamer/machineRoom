@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-18 14:10:45
+ * @LastEditTime: 2021-10-20 10:39:20
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -178,6 +178,7 @@ export default {
         this.joinImg(item)
         this.mjs3d.createObject(item)
       })
+      this.mjs3d.addFireBox()
 
       setTimeout(() => {
         this.mjs3d.setPipeLine()
@@ -186,10 +187,7 @@ export default {
       setTimeout(() => {
         this.createMonitor()
       }, 1000)
-
-      // this.mjs3d.addShapeDRN()
-
-      this.mjs3d.addFireBox()
+      this.mjs3d.setChairAndSofa()
     },
     joinImg(item) {
       const arr = ['skinUp', 'skinBottom', 'skinRight', 'skinLeft', 'skinFront', 'skinBack']

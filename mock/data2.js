@@ -5,7 +5,7 @@ const {
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-08 10:26:52
- * @LastEditTime: 2021-10-18 16:28:20
+ * @LastEditTime: 2021-10-20 09:54:32
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -903,6 +903,7 @@ const computerDesk = {
       y: 0,
       z: 0,
       skin: {
+        color: '#d2d6da',
         skinUp: {
           img: 'computerDesk.png'
         }
@@ -915,7 +916,10 @@ const computerDesk = {
       depth: 60,
       x: 0,
       y: 0,
-      z: 100
+      z: 100,
+      skin: {
+        color: '#d2d6da'
+      }
     },
     {
       type: 'cube',
@@ -924,7 +928,10 @@ const computerDesk = {
       depth: 10,
       x: 0,
       y: 50,
-      z: 120
+      z: 120,
+      skin: {
+        color: '#d2d6da'
+      }
     },
     {
       type: 'cube',
@@ -935,6 +942,7 @@ const computerDesk = {
       y: 100,
       z: 110,
       skin: {
+        color: '#d2d6da',
         skinLeft: {
           img: 'computer1.jpg'
         }

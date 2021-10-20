@@ -3,8 +3,18 @@ import * as THREE from 'three'
 import {
   OrbitControls
 } from 'three/examples/jsm/controls/OrbitControls'
+
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
+
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+
 const ThreeBSP = require('three-js-csg')(THREE)
-import { OBJLoader, MTLLoader } from 'three-obj-mtl-loader'
+// 加载文件load时候报错
+// import { OBJLoader, MTLLoader } from 'three-obj-mtl-loader'
 const TWEEN = require('@tweenjs/tween.js')
 
 import Stats from 'stats-js'
@@ -244,6 +254,9 @@ export default class Mjs3d {
           break
         case 'objloader':
           this.initObjLoader(item)
+          break
+        case 'gltfload':
+          this.initGLTF(item)
           break
         case 'shape':
           this.addObject(this.initShape(item))
@@ -1090,6 +1103,7 @@ export default class Mjs3d {
   }
   // obj mtl 3d模型加载
   initObjLoader(obj) {
+    const old = new Date().getTime() / 1000
     const {
       x,
       y,
@@ -1103,22 +1117,75 @@ export default class Mjs3d {
     const _this = this
     const objLoader = new OBJLoader() // obj加载器
     const mtlLoader = new MTLLoader() // 材质文件加载器
-    mtlLoader.load(`./images/${mtlImg}`, function(materials) {
-      // 返回一个包含材质的对象MaterialCreator
-      // console.log(materials);
-      // obj的模型会和MaterialCreator包含的材质对应起来
-      objLoader.setMaterials(materials)
-      objLoader.load(`./images/${objImg}`, function(obj) {
+    // 加载进度条
+    const onProgress = function(xhr) {
+      if (xhr.lengthComputable) {
+        var percentComplete = xhr.loaded / xhr.total * 100
+        // console.log(Math.round(percentComplete, 2) + '% downloaded')
+      }
+    }
+    if (mtlImg) {
+      mtlLoader.load(mtlImg, function(materials) {
+        // 返回一个包含材质的对象MaterialCreator
+        // console.log(materials);
+        // obj的模型会和MaterialCreator包含的材质对应起来
+        objLoader.setMaterials(materials)
+        objLoader.load(objImg, function(obj) {
+          scale && obj.scale.set(scale.x, scale.y, scale.z) // 放大obj组对象
+          rotate && _this.commonFunc.setRotate(obj, rotate)
+          obj.position.set(x, y, z)
+          obj.name = name
+
+          console.log((new Date().getTime() / 1000) - old + ' s')
+          _this.addObject(obj) // 返回的组对象插入场景中
+        })
+      })
+    } else {
+      objLoader.load(objImg, function(obj) {
         scale && obj.scale.set(scale.x, scale.y, scale.z) // 放大obj组对象
         rotate && _this.commonFunc.setRotate(obj, rotate)
         obj.position.set(x, y, z)
         obj.name = name
-        _this.progressSuccess += 1
-        // console.log(_this.progressSuccess)
-        _this.LoadSuccess()
-        _this.addObject(obj) // 返回的组对象插入场景中
+        console.log((new Date().getTime() / 1000) - a + ' s')
+      }, onProgress)
+    }
+  }
+  // 加载gltf文件
+  initGLTF(obj) {
+    const { x, y, z, rotate, scale, gltfImg, loadEndFn } = obj
+    const _this = this
+    const old = new Date().getTime() / 1000
+    const gltfLoad = new GLTFLoader()
+    const dracoLoad = new DRACOLoader()
+    dracoLoad.setDecoderPath('/draco/gltf/')
+    dracoLoad.setDecoderConfig({ type: 'js' })
+    dracoLoad.preload()
+    gltfLoad.setDRACOLoader(dracoLoad)
+    const onProgress = function(xhr) {
+      if (xhr.lengthComputable) {
+        var percentComplete = xhr.loaded / xhr.total * 100
+        // console.log(Math.round(percentComplete, 2) + '% downloaded')
+      }
+    }
+    gltfLoad.load(gltfImg, function(gltf) {
+      const object = gltf.scene
+      const objBbox = new THREE.Box3().setFromObject(gltf.scene)
+      const bboxCenter = objBbox.getCenter().clone()
+      bboxCenter.multiplyScalar(-1)
+      object.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.translate(bboxCenter.x, bboxCenter.y, bboxCenter.z)
+        }
       })
-    })
+      objBbox.setFromObject(object) // Update the bounding box
+      object.position.set(x, y, z)
+      scale && object.scale.set(scale.x, scale.y, scale.z) // 放大obj组对象
+      rotate && _this.commonFunc.setRotate(object, rotate)
+
+      loadEndFn && loadEndFn(object)
+      _this.addObject(object)
+      console.log((new Date().getTime() / 1000) - old + ' s')
+    }, onProgress)
   }
   // 创建皮肤
   createSkin(flength, fwidth, _obj) {

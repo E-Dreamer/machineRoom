@@ -9,9 +9,28 @@ npm install
 # 启动服务 localhost:8013
 npm run dev
 
+
+# 加载3d模型 对于过大的图形处理 
+文档地址：https://www.npmjs.com/package/obj2gltf
+npm i -g obj2gltf 
+使用obj2gltf 来转换成gltf并压缩
+-i 输入文件 -o 输出文件
+obj2gltf -i xxx.obj -o xxx.gltf
+
+gltf 文件压缩后的文件  地址：https://cnpmjs.org/package/gltf-pipeline
+npm install -g gltf-pipeline 
+
+同上 -i -o
+gltf-pipeline -i xxx.gltf -o xxx.gltf -d
+这里有个坑
+引入压缩的文件后 会报错 显示 unexpected token '<' 显示文件引入错误
+这是因为draco压缩了
+需要将draco文件复制到public下面 且添加 DRACOLoader.setDecoderPath('../../public/draco/')
+在vue中解决方法是将draco文件夹复制一份到public下面 不然就会报错
+```
 ## 基本的结构
 
-```
+```javascript
 {
   uuid:'',
   name:'', //物体的名称
@@ -46,6 +65,7 @@ npm run dev
 }
 
 # type 为 cabinet 时
+
 {
   uuid:'',
   name:"",
@@ -84,6 +104,7 @@ npm run dev
 }
 
 # type 为 tube 时  管道物体
+
 {
   uuid:"",
   name:"",
@@ -107,22 +128,27 @@ const mouseEvent = {
     {
      obj_name:"cabinet",//设置的物体的名称
      obj_event(obj){
-   
-     }
-    } 
+    }
+} 
+
    或者
     {
       findObject(_objname) {
                 // 判断
-                if (_objname.indexOf('cabinet') >= 0 && _objname.indexOf('door') >= 0) {
-                  return true;
-                }
-                return false;
+      if (_objname.indexOf('cabinet') >= 0 && _objname.indexOf('door') >= 0) {
+           return true;
+         }
+        return false;
       },
+      obj_event(obj){
+          
+      }
     }
   ],
   <!-- 鼠标经过 -->
   hover: []
 }
 
+
 ```
+
