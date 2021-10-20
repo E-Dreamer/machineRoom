@@ -1,17 +1,12 @@
 import Mjs3d from '@/threejs'
 import * as THREE from 'three'
-/*
- * @Author: E-Dreamer
- * @Date: 2021-10-15 10:32:29
- * @LastEditTime: 2021-10-20 10:49:02
- * @LastEditors: E-Dreamer
- * @Description:
- */
+import btn from './btn'
 export default class Twopage extends Mjs3d {
   constructor(...args) {
     super(...args)
     this.usage = false
     this.baseConfig.domId = '#twopage'
+    this.mouseEventList = btn
   }
   // * 生成管道的方法
   setPipeLine() {

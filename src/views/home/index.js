@@ -1,16 +1,18 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-14 15:44:04
- * @LastEditTime: 2021-10-19 09:42:15
+ * @LastEditTime: 2021-10-20 13:19:59
  * @LastEditors: E-Dreamer
  * @Description:
  */
 import Mjs3d from '@/threejs'
 import * as THREE from 'three'
+import mouseEvent from './btn'
 export default class Homes extends Mjs3d {
   constructor(...args) {
     super(...args)
     this.usage = false
+    this.mouseEventList = mouseEvent
   }
   setTables() {
     const group = this.initGroup({

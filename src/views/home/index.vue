@@ -344,7 +344,8 @@ export default {
       // this.mjs3d.createObject(this.floor1)
       // 渲染墙
       getData().then(res => {
-        this.wall.children = res.data.data
+        this.wall.children = res.data
+        console.log(res.data)
         this.setWindows()
         this.wall.children = [...this.wall.children, this.scene, ...this.door, ...this.windows, this.fireBox, this.air]
         this.setComputer()

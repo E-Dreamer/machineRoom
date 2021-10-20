@@ -40,14 +40,15 @@ gltf-pipeline -i xxx.gltf -o xxx.gltf -d
   x, //x轴位置
   y, //y轴位置
   z, // z轴位置
-  <!-- 正方体 | 平面 | 圆柱/三角柱 | 可开门的正方体 | 组() | 需要计算的 -->
-  type: 'cube | plane | cylinder | cabinet |  group | merge'
-  parent:{} // type 为 merge 必须
-  mergeChild:[] // type 为 merge 必须
+  <!-- 正方体 | 平面 | 圆柱/多边形柱 | 可开门的正方体 | 组() | 需要计算的 -->
+  type: 'cube | plane | cylinder | cabinet |  group | merge | shape | shpere | tube'
   skin:{
     color:'' //表示的整体颜色
     opacity:'' //整体透明度
     transparent: '' //整体是否完全透明
+    
+      
+    // 下面的属性为cube特有
     skinUp:{
       img:'' ,//该面的贴图
       repeatx: true, //贴图是否重复开启
@@ -120,8 +121,82 @@ gltf-pipeline -i xxx.gltf -o xxx.gltf -d
      opacity: 0.6
   }
 }
+# type 为 shpere 球体
+{
+  uuid:"",
+  name:"",
+  type:'shpere',
+  radius:12,//半径
+  x:0,
+  y:0,
+  z:0,
+  rotate:{},
+  skin:{
+    color:"", 
+    img:"",
+    transparent: true,
+    opacity: 0.6
+  }
+  widhtS:"", //水平段数
+  heightS:"", //垂直段数
+  phiStart:"", //指定水平起始角度
+  phiLength:"", //指定水平扫描角度大小
+  thetaStart:"", //指定垂直起始角度
+  thetaLenght:""// 指定垂直扫描角度大小
+}
 
-btn 物体点击事件配置
+# type 为 cylinder 圆柱体
+{
+  uuid:"",
+  name:"",
+  type:'cylinder',
+  x:0,
+  y:0,
+  z:0,
+  width:1,// 圆柱体顶部的半径
+  height:1,// 底部圆柱体的半径
+  depth:1,// 圆柱体的高度
+  rotate:{}, // 旋转
+  heightSegments:number,// 沿圆柱高度的面行数
+  radialSegments:number, //围绕圆柱圆周的分段面数 4就是4边型 越大越圆    
+  openEnded:true(Boolean), // 指示圆柱体的末端是开放的还是封闭的
+  skin:{
+    color:"", 
+    img:"",
+    transparent: true,
+    opacity: 0.6
+  }
+}
+# type 为 merge 合并对象时
+{
+  type:'merge',
+  // 父类物体 同上 type可为 cube | cylinder | shpere | shape 
+  parent:{
+    //数据配置
+     
+  } 
+  mergeChild:[
+      //多个数据配置
+  ] 
+}
+
+# type 为 group 组
+{
+    uuid:"",
+    name:"",
+    type:'group'
+    x:0,
+    y:0,
+    z:0,
+    children:[
+        //数据配置
+    ]
+}
+```
+
+#### btn 物体点击事件配置
+
+```
 const mouseEvent = {
   <!-- 单击 -->
   click: [
@@ -148,7 +223,5 @@ const mouseEvent = {
   <!-- 鼠标经过 -->
   hover: []
 }
-
-
 ```
 

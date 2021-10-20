@@ -1,10 +1,13 @@
 /*
  * @Author: E-Dreamer
  * @Date: 2021-09-28 10:35:16
- * @LastEditTime: 2021-10-18 13:30:48
+ * @LastEditTime: 2021-10-20 14:25:02
  * @LastEditors: E-Dreamer
  * @Description:
  */
+
+const { deepClone } = require('./utils')
+
 //* 白墙
 const whiteWall = [
   {
@@ -374,9 +377,47 @@ for (let i = 0; i < 2; i++) {
   i === 0 ? obj.z = 700 : obj.z = 1100
   computArr.push(obj)
 }
-
+const oneLight = {
+  uuid: '',
+  name: 'light',
+  type: 'group',
+  x: 100,
+  y: 800,
+  z: 100,
+  children: [
+    {
+      type: 'cylinder',
+      width: 20,
+      height: 20,
+      depth: 10,
+      x: 0,
+      y: 0,
+      z: 0,
+      skin: {
+        color: '#000'
+      }
+    },
+    {
+      type: 'shpere',
+      radius: 35,
+      x: 0,
+      y: -35,
+      z: 0,
+      skin: {
+        color: '#ebebeb'
+      }
+    }
+  ]
+}
+const light1 = deepClone(oneLight)
+light1.x = 1550
+light1.z = 480
+const light2 = deepClone(oneLight)
+light2.x = 5150
+light2.z = 1880
+const light = [oneLight, light1, light2]
 // 返回的数据
-const data = [...whiteWall, ...mergeWall, ...cabinet, table, ...computArr]
+const data = [...whiteWall, ...mergeWall, ...cabinet, table, ...computArr, ...light]
 const wallArr = [{
   width: 60,
   depth: 500,
@@ -446,9 +487,7 @@ module.exports = [{
   response: config => {
     return {
       code: 20000,
-      data: {
-        data
-      }
+      data
     }
   }
 }]

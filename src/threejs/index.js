@@ -19,8 +19,6 @@ const TWEEN = require('@tweenjs/tween.js')
 
 import Stats from 'stats-js'
 
-import mouseEvent from './btn'
-
 // 节流
 function throttle(event, time) {
   let pre = 0
@@ -56,7 +54,7 @@ export default class Mjs3d {
     this.btns = [] // 按钮组
     this.objects = [] // 所有要生成的物体数据
     this.sceneObject = [] // 场景里的物体
-    this.mouseEventList = mouseEvent
+    this.mouseEventList = []
     this.SELECTED = null // 选择的
     this.mouseClick = new THREE.Vector2()
     this.raycaster = new THREE.Raycaster()
@@ -138,6 +136,9 @@ export default class Mjs3d {
     this.point = null
     this.light = null
     cancelAnimationFrame(this.animation)
+    this.createBtn = {
+      usage: false
+    }
   }
   // 公用方法
   commonFunc = {
@@ -260,6 +261,9 @@ export default class Mjs3d {
           break
         case 'shape':
           this.addObject(this.initShape(item))
+          break
+        case 'shpere':
+          this.addObject(this.initShpere(item))
           break
         default:
           break
@@ -406,8 +410,9 @@ export default class Mjs3d {
       rotate
     } = obj
     const heightSegments = obj.heightSegments || 1
+    const radialSegments = obj.radialSegments || 8
     const openEnded = obj.openEnded || false
-    const geometry = new THREE.CylinderGeometry(width, height, depth, radial, heightSegments, openEnded)
+    const geometry = new THREE.CylinderGeometry(width, height, depth, radial, radialSegments, heightSegments, openEnded)
     let texture = null
     if (skin && skin.img) {
       texture = new THREE.TextureLoader().load(skin.img)
@@ -517,7 +522,7 @@ export default class Mjs3d {
     return materials
   }
   /**
-   * @description: 重构的生成正方体
+   * @description: 生成正方体
    * @param {*} obj 传递的数据
    * @param {*} flag 是否开启 定位
    * @return {*}
@@ -544,6 +549,27 @@ export default class Mjs3d {
     cube.uuid = obj.uuid // 给物体添加一个id
     cube.name = obj.name // 给物体添加一个name
     return cube
+  }
+  /**
+   * @description: 生成球体
+   * @param {*} obj 传递的数据
+   * @return {*}
+   */
+  initShpere(obj) {
+    const { x, y, z, name, rotate, radius, skin, widhtS, heightS, phiStart, phiLength, thetaStart, thetaLenght } = obj
+    const geometry = new THREE.SphereGeometry(radius, widhtS || 32, heightS || 16, phiStart || 0, phiLength || Math.PI * 2, thetaStart || 0, thetaLenght || Math.PI)
+    const material = this.commonFunc.setMaterials({
+      color: (skin && skin.color) || '#fff',
+      side: THREE.DoubleSide,
+      opacity: (skin && skin.opacity) || 1,
+      transparent: (skin && skin.transparent) || false,
+      map: (skin && skin.img && new THREE.TextureLoader().load(skin.img)) || null
+    })
+    const shpere = new THREE.Mesh(geometry, material)
+    shpere.name = name || 'shpere'
+    shpere.position.set(x, y, z)
+    rotate && this.commonFunc.setRotate(shpere, rotate)
+    return shpere
   }
   /**
    * @description: 合并类型
@@ -1090,6 +1116,9 @@ export default class Mjs3d {
           case 'shape':
             group.add(this.initShape(item))
             break
+          case 'shpere':
+            group.add(this.initShpere(item))
+            break
           default:
             break
         }
@@ -1534,6 +1563,7 @@ export default class Mjs3d {
     // 根据容量显示不同的颜色
     let _skinColor
     const capaHeight = Math.floor(Math.random() * 2)
+    console.log(capaHeight)
     if (capaHeight < 0.5) {
       _skinColor = 0x0af60a // 绿色
     } else if (capaHeight < 1) {
