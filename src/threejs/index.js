@@ -18,6 +18,7 @@ const ThreeBSP = require('three-js-csg')(THREE)
 const TWEEN = require('@tweenjs/tween.js')
 
 import Stats from 'stats-js'
+import { deepClone } from '@/utils'
 
 // 节流
 function throttle(event, time) {
@@ -64,7 +65,8 @@ export default class Mjs3d {
     this.material = 'Basic'
     // 按钮点击需要的参数
     this.createBtn = {
-      usage: false
+      usage: false,
+      shapeDRN: false
     }
   }
   onWindowResize() { // 自适应
@@ -137,7 +139,8 @@ export default class Mjs3d {
     this.light = null
     cancelAnimationFrame(this.animation)
     this.createBtn = {
-      usage: false
+      usage: false,
+      shapeDRN: false
     }
   }
   // 公用方法
@@ -279,6 +282,7 @@ export default class Mjs3d {
   // * 移除物体
   removeObject(name) {
     const _obj = this.scene.getObjectByName(name)
+    console.log(_obj)
     // 删除场景中的元素
     if (!_obj) return
 
@@ -290,9 +294,8 @@ export default class Mjs3d {
     this.scene.remove(_obj)
     // 删除objects中的值
     const _index = this.sceneObject.indexOf(_obj)
-
-    if (_index > 0) {
-      this.sceneObject = this.sceneObject.splice(_index, 1)
+    if (_index > 0 && _index <= this.sceneObject.length) {
+      this.sceneObject.splice(_index, 1)
     }
   }
   /**
@@ -962,7 +965,6 @@ export default class Mjs3d {
   }
   // 特殊柜子的机柜
   createSpecifiCard(obj) {
-    console.log(obj)
     const _box = obj.parent.parent
     let _height = 0 // 初始高度
     // let boxheight = _box.position.y + 200
@@ -1027,7 +1029,6 @@ export default class Mjs3d {
   // 生成机柜里面的机箱
   createCard(obj, cardBox) {
     const _box = obj.parent.parent // 这是机柜的group组
-    console.log(_box)
     let _height = 10 // 初始高度
     const boxheight = obj.geometry.parameters.height || 200
     const cardWidth = obj.geometry.parameters.width > 10 ? obj.geometry.parameters.width - 20 : 100
@@ -1333,15 +1334,19 @@ export default class Mjs3d {
   }
   mouseCommon(event) {
     event.preventDefault()
+    // const px = this.renderer.domElement.getBoundingClientRect().left
+    // const py = this.renderer.domElement.getBoundingClientRect().top
+    // this.mouseClick.x = ((event.clientX - px) / (this.renderer.domElement.offsetWidth)) * 2 - 1
+    // this.mouseClick.y = -((event.clientY - py) / (this.renderer.domElement.offsetHeight)) * 2 + 1
     this.mouseClick.x = (event.offsetX / this.width) * 2 - 1
     this.mouseClick.y = -(event.offsetY / this.height) * 2 + 1
-    this.raycaster.setFromCamera(this.mouseClick, this.camera)
+    this.camera && this.raycaster.setFromCamera(this.mouseClick, this.camera)
     return this.raycaster.intersectObjects(this.sceneObject, true)
   }
   // 各类物体的点击事件
   documentMouseClick(event, type) {
     const intersects = this.mouseCommon(event)
-    // console.log(intersects, '拿到的点击的物体')
+    console.log(intersects, '拿到的点击的物体')
     // intersects length 为 0 直接中断 函数
     if (!intersects.length) return
     this.SELECTED = intersects[0].object
@@ -1367,9 +1372,9 @@ export default class Mjs3d {
       this.renderer.domElement.addEventListener('click', throttle((e) => {
         this.documentMouseClick(e, 'click')
       }, 1000), false)
-      this.renderer.domElement.addEventListener('mousemove', throttle((e) => {
-        this.documentMouseClick(e, 'hover')
-      }, 1000), false)
+      // this.renderer.domElement.addEventListener('mousemove', throttle((e) => {
+      //   this.documentMouseClick(e, 'hover')
+      // }, 1000), false)
     }
 
     this.animation()
@@ -1390,6 +1395,12 @@ export default class Mjs3d {
 
     if (TWEEN != null && typeof TWEEN !== 'undefined') {
       TWEEN.update()
+    }
+
+    if (this.createBtn.shapeDRN) {
+      // 3d扇形图存在 就让他旋转
+      const obj = this.commonFunc.findObject('3d扇形图')
+      obj.rotation.y += 0.01
     }
   }
   timeRender(time = 3000) {
@@ -1564,7 +1575,6 @@ export default class Mjs3d {
     // 根据容量显示不同的颜色
     let _skinColor
     const capaHeight = Math.floor(Math.random() * 2)
-    console.log(capaHeight)
     if (capaHeight < 0.5) {
       _skinColor = 0x0af60a // 绿色
     } else if (capaHeight < 1) {
@@ -1656,7 +1666,8 @@ export default class Mjs3d {
         arr.map(item => {
           if (item.name.includes(name)) {
             // item.children.length = 6 的时候 是创建的机柜 原本的组
-            if (item.type === 'Group' && item.children.length > 6) {
+            // item.type === 'Group' && item.children.length > 6
+            if (item.specific !== '机柜' && item.type === 'Group') {
               // 组的情况就要在group.children中找 制定的物体
               // parentGroup = this.commonFunc.cloneObj(item)
               // parentGroup.children = []
@@ -1716,7 +1727,18 @@ export default class Mjs3d {
     }
   }
   //* 3d扇形轮播图
-  addShapeDRN(obj) {
+  addShapeDRN(obj, self) {
+    if (this.createBtn.shapeDRN) {
+      this.removeObject('3d扇形图')
+      this.createBtn.shapeDRN = false
+      return
+    }
+
+    this.createBtn.shapeDRN = true
+
+    // const cabinetGroup = self.parent.parent
+    // this.setOpacity(self, cabinetGroup.children)
+    // this.setOpacity(self)
     // Arc circle圆弧drn
     /**
      * absarc ( x : Float, y : Float, radius : Float, startAngle : Float, endAngle : Float, clockwise : Float ) : null
@@ -1737,10 +1759,10 @@ export default class Mjs3d {
      */
     var arcShapeDrn01 = new THREE.Shape()
     //  需要长:280,高300 平分6分,60度,中间有间隙取50度, 通过公式,为L=n× π× r/180,L=α× r。其中n是圆心角度数,r是半径,L是圆心角弧长得 r=320,n=50,弧度=280,
-    arcShapeDrn01.moveTo(260, 0)
-    arcShapeDrn01.lineTo(270, 0)
-    arcShapeDrn01.absarc(0, 0, 270, 0, Math.PI * 2 / 6 / 6 * 5, false)
-    arcShapeDrn01.absarc(0, 0, 260, Math.PI * 2 / 6 / 6 * 5, 0, true)
+    arcShapeDrn01.moveTo(250, 0)
+    arcShapeDrn01.lineTo(260, 0)
+    arcShapeDrn01.absarc(0, 0, 260, 0, Math.PI * 2 / 6 / 6 * 5, false)
+    arcShapeDrn01.absarc(0, 0, 250, Math.PI * 2 / 6 / 6 * 5, 0, true)
     var shape = arcShapeDrn01
 
     /**
@@ -1755,29 +1777,30 @@ export default class Mjs3d {
       UVGenerator — Object。提供了UV生成器函数的对象。
       */
     var extrudeSettings = {
-      depth: 350,
+      depth: 250,
       bevelEnabled: false,
       bevelSegments: 9,
-      steps: 2,
+      steps: 1,
       bevelSize: 0,
       bevelThickness: 0
     }
-    const x = -500
-    const y = 450
-    const z = 0
+    // const x = -500
+    // const y = 450
+    // const z = 0
+    const { x, y, z } = obj
 
     const rx = Math.PI / 2
     const ry = 0
     const rz = 0
     const s = 1
     const group = new THREE.Group()
-    group.name = '3d'
-    group.position.set(0, 0, 0)
+    group.name = '3d扇形图'
+    group.position.set(x, y, z)
 
-    const texture = new THREE.TextureLoader().load(require('../assets/images/scene.png'))
+    const texture = new THREE.TextureLoader().load(require('../assets/images/温度.png'))
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
     // texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
-    texture.repeat.set(0.004, 0.001)
+    texture.repeat.set(0.005, 0.004)
     // 弧线
     // const geometry = new THREE.ShapeBufferGeometry(shape)
     // const mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
@@ -1788,18 +1811,20 @@ export default class Mjs3d {
     // mesh.rotation.set(rx, ry, rz)
     // mesh.scale.set(s, s, s)
     // group.add(mesh)
-
     const geometry1 = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings)
     const material = new THREE.MeshBasicMaterial({
       color: 0x6188d2,
-      // opacity: 0.8,
-      // transparent: true,
+      opacity: 0.8,
+      transparent: true,
       map: texture
     })
     var mesh1 = new THREE.Mesh(geometry1, material)
-    mesh1.position.set(x, y, z)
+
+    console.log(material)
+    mesh1.position.set(0, 0, 0)
     mesh1.rotation.set(rx, ry, rz)
-    mesh1.scale.set(s, s, s)
+    // mesh1.scale.set(s, s, s)
+    mesh1.scale.x = -1
     group.add(mesh1)
 
     var mesh2 = mesh1.clone()
@@ -1816,5 +1841,34 @@ export default class Mjs3d {
     group.add(mesh5)
 
     this.addObject(group)
+  }
+  //* 除自身外 其他物体透明
+  setOpacity(self, arr = this.sceneObject) {
+    const changeMatrial = (obj) => {
+      obj.opacity = 0.2
+      obj.transparent = true
+    }
+
+    const digui = (arr, obj) => {
+      arr.forEach(item => {
+        // 自身 墙 地板 不需要透明
+        if (JSON.stringify(item) !== JSON.stringify(obj.parent) && item.name !== 'floor' && item.name !== 'wall') {
+          // 改变材质的opacity 和  transparent
+          if (item.material) {
+            if (Array.isArray(item.material)) {
+              item.material.forEach(item => {
+                changeMatrial(item)
+              })
+            } else {
+              changeMatrial(item.material)
+            }
+          }
+          if (item instanceof THREE.Group && item.children && item.children.length) {
+            digui(item.children, obj)
+          }
+        }
+      })
+    }
+    digui(arr, self)
   }
 }

@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-20 10:39:20
+ * @LastEditTime: 2021-10-22 09:21:19
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -26,15 +26,33 @@
           <div class="content">
             <p class="slider">
               <span>仰角:</span>
-              <el-slider v-model="item.elevation" :min="-1" :max="1" :step="0.001" @input="(val)=>input(val,'elevation',index)" />
+              <el-slider
+                v-model="item.elevation"
+                :min="-1"
+                :max="1"
+                :step="0.001"
+                @input="(val)=>input(val,'elevation',index)"
+              />
             </p>
             <p class="slider">
               <span>转角:</span>
-              <el-slider v-model="item.corner" :min="-1" :max="1" :step="0.001" @input="(val)=>input(val,'corner',index)" />
+              <el-slider
+                v-model="item.corner"
+                :min="-1"
+                :max="1"
+                :step="0.001"
+                @input="(val)=>input(val,'corner',index)"
+              />
             </p>
             <p class="slider">
               <span>远近:</span>
-              <el-slider v-model="item.distance" :min="-1" :max="1" :step="0.001" @input="(val)=>input(val,'distance',index)" />
+              <el-slider
+                v-model="item.distance"
+                :min="-1"
+                :max="1"
+                :step="0.001"
+                @input="(val)=>input(val,'distance',index)"
+              />
             </p>
             <div>
               <p style="font-weight:700">当前监控画面预览</p>
@@ -48,8 +66,16 @@
       </div>
     </div>
     <div class="footer">
-      <el-button type="primary" size="mini" @click="property">资产</el-button>
-      <el-button type="primary" size="mini" @click="capacity">容量</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        @click="property"
+      >资产</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        @click="capacity"
+      >容量</el-button>
     </div>
   </div>
 </template>
@@ -57,7 +83,7 @@
 .footer {
   position: absolute;
   bottom: 10px;
-  left:0;
+  left: 0;
 }
 .views {
   text-align: center;
@@ -65,13 +91,13 @@
 .slider {
   display: flex;
   align-items: center;
-  margin-left:10px;
+  margin-left: 10px;
   span {
-    width:50px;
+    width: 50px;
   }
 }
 .el-slider {
-  flex:0.9
+  flex: 0.9;
 }
 #monitor {
   position: absolute;

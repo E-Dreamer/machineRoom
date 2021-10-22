@@ -5,7 +5,7 @@ const {
 /*
  * @Author: E-Dreamer
  * @Date: 2021-10-08 10:26:52
- * @LastEditTime: 2021-10-20 09:54:32
+ * @LastEditTime: 2021-10-21 13:18:15
  * @LastEditors: E-Dreamer
  * @Description:
  */
@@ -1150,7 +1150,7 @@ for (let i = 0; i < 8; i++) {
       height: 400,
       depth: 150,
       doorDiraction: 'left',
-      doorName: 'cabinet_twopagedoor',
+      doorName: 'cabinet',
       x: j === 0 ? 120 : -50,
       y: 0,
       z: -562 + i * 75,
