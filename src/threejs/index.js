@@ -18,7 +18,6 @@ const ThreeBSP = require('three-js-csg')(THREE)
 const TWEEN = require('@tweenjs/tween.js')
 
 import Stats from 'stats-js'
-import { deepClone } from '@/utils'
 
 // 节流
 function throttle(event, time) {
@@ -241,6 +240,9 @@ export default class Mjs3d {
         case 'tube':
           this.addObject(this.initTube(item))
           break
+        case 'line':
+          this.addObject(this.initLine(item))
+          break
         case 'plane':
           this.addObject(this.initPlane(item))
           break
@@ -282,7 +284,6 @@ export default class Mjs3d {
   // * 移除物体
   removeObject(name) {
     const _obj = this.scene.getObjectByName(name)
-    console.log(_obj)
     // 删除场景中的元素
     if (!_obj) return
 
@@ -1099,6 +1100,9 @@ export default class Mjs3d {
           case 'tube':
             group.add(this.initTube(item))
             break
+          case 'line':
+            this.addObject(this.initLine(item))
+            break
           case 'plane':
             group.add(this.initPlane(item))
             break
@@ -1574,14 +1578,14 @@ export default class Mjs3d {
     }
     // 根据容量显示不同的颜色
     let _skinColor
-    const capaHeight = Math.floor(Math.random() * 2)
-    if (capaHeight < 0.5) {
+    const capaHeight = Math.random() * 1
+    if (capaHeight < 0.25) {
       _skinColor = 0x0af60a // 绿色
-    } else if (capaHeight < 1) {
+    } else if (capaHeight < 0.5) {
       _skinColor = 0xf7f807 // 黄色
-    } else if (capaHeight < 1.5) {
+    } else if (capaHeight < 0.75) {
       _skinColor = 0xf79707 // 橙色
-    } else if (capaHeight < 2) {
+    } else if (capaHeight <= 1) {
       _skinColor = 0xf80404 // 红色
     }
     const cubeobj = {
@@ -1592,7 +1596,7 @@ export default class Mjs3d {
       width,
       height,
       x: _obj.position.x * 2,
-      y: capaHeight === 0 ? 10 : (height / 2) - capaHeight,
+      y: height * capaHeight / 2,
       z: _obj.position.z * 2,
       skin: {
         color: _skinColor
@@ -1608,6 +1612,7 @@ export default class Mjs3d {
       .easing(TWEEN.Easing.Elastic.Out)
       .onComplete(function() {})
       .start()
+
     const edgesLine = this.createEdges(esgobj)
     if (_obj.type === 'Group') {
       group.add(cube)
@@ -1651,6 +1656,21 @@ export default class Mjs3d {
     }
 
     return path
+  }
+
+  initLine(obj) {
+    const { pathArr, color } = obj
+    const path = []
+    pathArr.forEach(item => {
+      item.length && path.push(new THREE.Vector3(item[0], item[1], item[2]))
+    })
+    const geometry = new THREE.BufferGeometry().setFromPoints(path)
+    const material = this.commonFunc.setMaterials({
+      side: THREE.DoubleSide,
+      color: color || '#fff'
+    })
+    const line = new THREE.Line(geometry, material)
+    return line
   }
   /**
    * @description: 展示容量
@@ -1792,14 +1812,14 @@ export default class Mjs3d {
     const rx = Math.PI / 2
     const ry = 0
     const rz = 0
-    const s = 1
+    // const s = 1
     const group = new THREE.Group()
     group.name = '3d扇形图'
     group.position.set(x, y, z)
 
     const texture = new THREE.TextureLoader().load(require('../assets/images/温度.png'))
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-    // texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
+    // texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+    texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
     texture.repeat.set(0.005, 0.004)
     // 弧线
     // const geometry = new THREE.ShapeBufferGeometry(shape)
@@ -1811,6 +1831,8 @@ export default class Mjs3d {
     // mesh.rotation.set(rx, ry, rz)
     // mesh.scale.set(s, s, s)
     // group.add(mesh)
+
+    // const geometry1 = new THREE.ShapeGeometry(shape, 50)
     const geometry1 = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings)
     const material = new THREE.MeshBasicMaterial({
       color: 0x6188d2,
@@ -1820,7 +1842,6 @@ export default class Mjs3d {
     })
     var mesh1 = new THREE.Mesh(geometry1, material)
 
-    console.log(material)
     mesh1.position.set(0, 0, 0)
     mesh1.rotation.set(rx, ry, rz)
     // mesh1.scale.set(s, s, s)

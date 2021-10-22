@@ -1077,32 +1077,31 @@ export default class Twopage extends Mjs3d {
         x: -Math.PI / 2
       },
       loadEndFn: (obj) => {
-        const arr = [
-          {
-            x: -200,
-            z: 1500
-          },
-          {
-            x: 0,
-            z: -1400,
-            rotate: {
-              z: Math.PI
-            }
-          },
-          {
-            x: 400,
-            z: -1400,
-            rotate: {
-              z: Math.PI
-            }
-          },
-          {
-            x: 800,
-            z: -1400,
-            rotate: {
-              z: Math.PI
-            }
+        const arr = [{
+          x: -200,
+          z: 1500
+        },
+        {
+          x: 0,
+          z: -1400,
+          rotate: {
+            z: Math.PI
           }
+        },
+        {
+          x: 400,
+          z: -1400,
+          rotate: {
+            z: Math.PI
+          }
+        },
+        {
+          x: 800,
+          z: -1400,
+          rotate: {
+            z: Math.PI
+          }
+        }
         ]
         arr.forEach(item => {
           const mesh1 = obj.clone()
@@ -1140,5 +1139,88 @@ export default class Twopage extends Mjs3d {
     //     z: 6
     //   }
     // })
+  }
+  //* 曲面平面
+  setHookFace() {
+    const width = 500
+    const height = 500
+    const width_segments = 1
+    const height_segments = 39 // 平面几何体长宽面分段数
+    const plane1 = new THREE.PlaneGeometry(width, height, width_segments, height_segments)
+    console.log(plane1.vertices)
+    /*
+     * 用vertices属性获取顶点队列，然后遍历
+     *  Z轴坐标值可根据需要自行修改计算函数
+     */
+    var m, n
+    for (var i = 0; i < plane1.vertices.length / 2; i++) {
+      m = Math.abs(plane1.vertices[2 * i].x) + Math.abs(plane1.vertices[2 * i].y)
+      n = Math.abs(plane1.vertices[2 * i + 1].x) + Math.abs(plane1.vertices[2 * i + 1].y)
+      plane1.vertices[2 * i].z = m / (i + 1.5)
+      plane1.vertices[2 * i + 1].z = n / (i + 1.5)
+    }
+
+    const texture_plan = new THREE.TextureLoader().load(require('../../assets/images/scene.png')) // 创建材质
+    const mesh_plan = new THREE.Mesh(plane1, new THREE.MeshLambertMaterial({
+      map: texture_plan,
+      side: THREE.DoubleSide
+      // transparent: true,
+      // opacity: 0.5
+    }))
+    mesh_plan.position.set(0, 400, 0)
+    mesh_plan.rotateX(Math.PI / 2)
+    this.addObject(mesh_plan)
+  }
+  // * 风向
+  setWindDirection() {
+    const shape = new THREE.Shape()
+    shape.moveTo(100, 100)
+    shape.lineTo(120, 100)
+    // const geometry =
+  }
+  setLine() {
+    const allGroup = new THREE.Group()
+    allGroup.name = 'line'
+    allGroup.position.set(-3000, 0, -2000)
+    const groupArr = [{
+      x: 650,
+      y: 400,
+      z: 2700
+    },
+    {
+      x: 4050,
+      y: 400,
+      z: 2700
+    },
+    {
+      x: 5050,
+      y: 400,
+      z: 2700
+    }
+    ]
+    groupArr.forEach(item => {
+      const group = this.initGroup({
+        x: item.x,
+        y: item.y,
+        z: item.z
+      })
+      for (var j = 0; j < 2; j++) {
+        for (var i = 0; i < 8; i++) {
+          const obj = {
+            pathArr: [
+              [j ? -180 : 230, 0, -10 + i * 150],
+              [j ? -180 : 230, 300, -10 + i * 150],
+              [j ? -10 : 10, 300, -10 + i * 150],
+              [10, 300, 1300]
+            ],
+            color: '#e39e5c'
+          }
+          const line = this.initLine(obj)
+          group.add(line)
+        }
+      }
+      allGroup.add(group)
+    })
+    this.addObject(allGroup)
   }
 }
