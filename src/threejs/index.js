@@ -1779,10 +1779,10 @@ export default class Mjs3d {
      */
     var arcShapeDrn01 = new THREE.Shape()
     //  需要长:280,高300 平分6分,60度,中间有间隙取50度, 通过公式,为L=n× π× r/180,L=α× r。其中n是圆心角度数,r是半径,L是圆心角弧长得 r=320,n=50,弧度=280,
-    arcShapeDrn01.moveTo(250, 0)
-    arcShapeDrn01.lineTo(260, 0)
-    arcShapeDrn01.absarc(0, 0, 260, 0, Math.PI * 2 / 6 / 6 * 5, false)
-    arcShapeDrn01.absarc(0, 0, 250, Math.PI * 2 / 6 / 6 * 5, 0, true)
+    arcShapeDrn01.moveTo(200, 0)
+    arcShapeDrn01.lineTo(210, 0)
+    arcShapeDrn01.absarc(0, 0, 210, 0, Math.PI * 2 / 6 / 6 * 5, false)
+    arcShapeDrn01.absarc(0, 0, 200, Math.PI * 2 / 6 / 6 * 5, 0, true)
     var shape = arcShapeDrn01
 
     /**
@@ -1818,8 +1818,7 @@ export default class Mjs3d {
     group.position.set(x, y, z)
 
     const texture = new THREE.TextureLoader().load(require('../assets/images/温度.png'))
-    // texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-    texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
     texture.repeat.set(0.005, 0.004)
     // 弧线
     // const geometry = new THREE.ShapeBufferGeometry(shape)
