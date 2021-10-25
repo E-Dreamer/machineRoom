@@ -1,7 +1,7 @@
 <!--
  * @Author: E-Dreamer
  * @Date: 2021-09-30 14:12:51
- * @LastEditTime: 2021-10-22 14:07:04
+ * @LastEditTime: 2021-10-25 09:27:25
  * @LastEditors: E-Dreamer
  * @Description:
 -->
@@ -214,7 +214,7 @@ export default {
         this.createMonitor()
       }, 1000)
       this.mjs3d.setChairAndSofa()
-      this.mjs3d.setLine()
+      // this.mjs3d.setLine()
     },
     joinImg(item) {
       const arr = ['skinUp', 'skinBottom', 'skinRight', 'skinLeft', 'skinFront', 'skinBack']

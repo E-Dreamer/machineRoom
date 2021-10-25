@@ -498,25 +498,13 @@ export default class Twopage extends Mjs3d {
       -20,
 
       // 需要贴图的面
-      50,
-      10,
-      20,
-      70,
-      50,
-      20,
-      70,
-      50,
-      -20,
+      50, 10, 20,
+      70, 50, 20,
+      70, 50, -20,
 
-      50,
-      10,
-      20,
-      50,
-      10,
-      -20,
-      70,
-      50,
-      -20
+      50, 10, 20,
+      50, 10, -20,
+      70, 50, -20
     ]
 
     // 外壳
@@ -593,6 +581,24 @@ export default class Twopage extends Mjs3d {
     const mesh = new THREE.Mesh(geometry, material)
     group.add(mesh)
 
+    // 贴图的面
+    const header = this.initCube({
+      width: 1,
+      height: 40,
+      depth: 40,
+      x: 63,
+      y: 30,
+      z: 0,
+      rotate: {
+        z: -Math.PI / 6.5
+      },
+      skin: {
+        img: require('../../assets/images/camera.png')
+      }
+    })
+
+    group.add(header)
+
     // 三角锥
     const coneGeometry = new THREE.ConeGeometry(100, 300, 4, 1, true)
     const coneMaterial = this.commonFunc.setMaterials({
@@ -637,8 +643,6 @@ export default class Twopage extends Mjs3d {
 
     // 监视器前面的画面
     // const renderCube = new THREE.WebGLRenderTarget(140, 140)
-    // const RTscene = new THREE.Scene()
-    // this.RTscene.push(RTscene)
     const plane = new THREE.PlaneGeometry(140, 140)
     const texture = new THREE.CanvasTexture(render.domElement)
     const planeMaterial = this.commonFunc.setMaterials({
